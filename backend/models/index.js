@@ -6,7 +6,11 @@ require('dotenv').config();
 const pgUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL;
 const usePostgres = pgUrl && pgUrl.startsWith('postgres');
 const sequelize = usePostgres
-  ? new Sequelize(pgUrl, { dialect: 'postgres', logging: false })
+  ? new Sequelize(pgUrl, {
+      dialect: 'postgres',
+      logging: false,
+      dialectOptions: pgUrl.includes('sslmode') ? {} : { ssl: { require: true, rejectUnauthorized: false } },
+    })
   : new Sequelize({
       dialect: 'sqlite',
       storage: path.join(__dirname, '..', 'database.sqlite'),
