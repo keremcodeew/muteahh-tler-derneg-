@@ -1,0 +1,10 @@
+{
+  "buildCommand": "cd backend && npm run db:sync && npm run seed:admin && cd ../frontend && npm run build",
+  "installCommand": "npm install && cd backend && npm install && cd ../frontend && npm install",
+  "outputDirectory": "frontend/dist",
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "framework": null
+}
