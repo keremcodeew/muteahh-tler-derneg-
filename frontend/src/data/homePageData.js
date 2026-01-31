@@ -3,6 +3,17 @@ export const heroData = {
   backgroundImage: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1920&q=80',
 };
 
+export const sliderItems = [
+  { id: 1, date: '30 Ocak 2025', title: '2025 Yılı Genel Kurul Toplantısı', description: 'Derneğimizin yıllık olağan genel kurul toplantısı gerçekleştirilecektir.', image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1452&h=726&q=80', link: '/announcements' },
+  { id: 2, date: '28 Ocak 2025', title: 'İnşaat Sektörü Semineri', description: 'Kalite standartları ve güncel mevzuat değişiklikleri hakkında bilgilendirme semineri.', image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1452&h=726&q=80', link: '/news' },
+  { id: 3, date: '25 Ocak 2025', title: 'Antalya Konut Projeleri Zirvesi', description: 'Antalya bölgesindeki konut projeleri ve gelecek planları masaya yatırılacak.', image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1452&h=726&q=80', link: '/news' },
+];
+
+export const fallbackEvents = [
+  { id: 1, date: '15 Şubat 2025', title: 'Üye Kabul Toplantısı', location: 'Dernek Binası' },
+  { id: 2, date: '28 Şubat 2025', title: 'İnşaat Teknolojileri Semineri', location: 'Antalya' },
+];
+
 export const bannerItems = [
   { id: 1, title: 'Altyapı Projeleri', description: 'Modern şehir altyapısı', image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80', link: '/news' },
   { id: 2, title: 'Konut Projeleri', description: 'Kaliteli yaşam alanları', image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80', link: '/news' },
