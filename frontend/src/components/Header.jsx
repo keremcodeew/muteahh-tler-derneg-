@@ -27,12 +27,14 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           <Link to="/" className="flex items-center gap-2 shrink-0">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 32 32">
+            <div className="w-10 h-10 bg-sky-light rounded-lg flex items-center justify-center">
+              <svg className="w-6 h-6 text-navy" fill="currentColor" viewBox="0 0 32 32">
                 <path d="M16 2L4 8v6l12 6 12-6V8L16 2zm0 2.5L22 8l-6 3.5L10 8l6-3.5zM6 9.5l4 2v4L6 13.5v-4zm20 0v4l-4 2v-4l4-2zM16 14l-4 2v4l4 2 4-2v-4l-4-2zM8 22l8 4 8-4v-2l-8 4-8-4v2z"/>
               </svg>
             </div>
-            <span className="font-serif text-xl font-semibold text-primary hidden sm:inline">Müteahhitler Derneği</span>
+            <span className="text-base text-dark-gray hidden sm:inline">
+              <span>Antalya</span> <span className="font-semibold">Müteahhitler</span> <span>Derneği</span>
+            </span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">
@@ -46,7 +48,7 @@ export default function Header() {
                   }`
                 }
               >
-                {label}
+                {label.toUpperCase()}
               </NavLink>
             ))}
           </nav>
@@ -61,23 +63,13 @@ export default function Header() {
               </Link>
             )}
             {isAuthenticated ? (
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleLogout}
-                  className="text-sm font-medium text-dark-gray hover:text-primary transition-colors py-2 px-3"
-                >
-                  Çıkış
-                </button>
-              </div>
+              <button onClick={handleLogout} className="text-sm font-medium text-dark-gray hover:text-primary transition-colors py-2 px-3">
+                Çıkış
+              </button>
             ) : (
-              <>
-                <Link to="/login" className="text-sm font-medium text-dark-gray hover:text-primary transition-colors py-2 px-3 hidden sm:inline">
-                  Giriş
-                </Link>
-                <Link to="/register" className="btn-primary text-sm py-2 px-4">
-                  Üye Ol
-                </Link>
-              </>
+              <Link to="/login" className="btn-primary text-sm py-2 px-5 rounded-lg">
+                GİRİŞ
+              </Link>
             )}
             <button
               type="button"
@@ -111,7 +103,7 @@ export default function Header() {
                     `px-4 py-3 rounded-md font-medium ${isActive ? 'text-primary bg-primary/5' : 'text-dark-gray'}`
                   }
                 >
-                  {label}
+                  {label.toUpperCase()}
                 </NavLink>
               ))}
               {isContentAdmin && (

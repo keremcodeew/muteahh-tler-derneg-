@@ -23,6 +23,6 @@ export const testimonial = {
 
 export const aboutData = {
   title: 'Antalya Müteahhitler Derneği Hakkında',
-  description: '1985 yılından bu yana Antalya ve çevresindeki inşaat sektörünün gelişimine katkı sağlayan derneğimiz, üyelerine eğitim, danışmanlık ve ağ oluşturma imkânları sunmaktadır. Kalite, güven ve dayanışma ilkeleriyle hareket ediyoruz.',
+  description: 'Antalya Müteahhitler Derneği, 1980 yılından bu yana Antalya ve çevresindeki inşaat sektörünün gelişimine katkı sağlayan derneğimiz, üyelerine eğitim, danışmanlık ve ağ oluşturma imkânları sunmaktadır. Kalite, güven ve dayanışma ilkeleriyle hareket ediyoruz.',
   image: 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=600&q=80',
 };

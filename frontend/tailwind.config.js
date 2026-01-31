@@ -9,6 +9,7 @@ export default {
         navy: '#1e3a5f',
         gold: '#d4a853',
         'gold-light': '#e8c97a',
+        'sky-light': '#7dd3fc',
         'dark-gray': '#2B2B2B',
         'light-gray': '#f9fafb',
       },
