@@ -9,18 +9,34 @@ function isoFromDotDate(dot) {
   return `${yyyy}-${mm}-${dd}`;
 }
 
-async function seedIfEmpty(model, rows, name) {
-  const count = await model.count();
-  if (count > 0) {
-    console.log(`${name}: skip (has ${count})`);
-    return;
-  }
+async function seedMissingByKey(model, rows, name, getKey) {
   if (!rows.length) {
     console.log(`${name}: skip (no seed rows)`);
     return;
   }
-  await model.bulkCreate(rows);
-  console.log(`${name}: seeded ${rows.length}`);
+
+  const existing = await model.findAll({ attributes: ['id', 'title', 'code'] }).catch(() => []);
+  const existingKeys = new Set(
+    (existing || [])
+      .map((r) => {
+        const any = r && typeof r.get === 'function' ? r.get({ plain: true }) : r;
+        return getKey(any);
+      })
+      .filter(Boolean)
+  );
+
+  const toInsert = rows.filter((r) => {
+    const k = getKey(r);
+    return k && !existingKeys.has(k);
+  });
+
+  if (!toInsert.length) {
+    console.log(`${name}: up-to-date`);
+    return;
+  }
+
+  await model.bulkCreate(toInsert);
+  console.log(`${name}: inserted ${toInsert.length} missing rows`);
 }
 
 async function seed() {
@@ -208,11 +224,16 @@ async function seed() {
       },
     ];
 
-    await seedIfEmpty(db.HeroSlide, slides, 'HeroSlide');
-    await seedIfEmpty(db.News, news, 'News');
-    await seedIfEmpty(db.Announcement, announcements, 'Announcement');
-    await seedIfEmpty(db.Video, videos, 'Video');
-    await seedIfEmpty(db.Publication, publications, 'Publication');
+    await seedMissingByKey(db.HeroSlide, slides, 'HeroSlide', (r) => String(r?.title || '').trim());
+    await seedMissingByKey(db.News, news, 'News', (r) => String(r?.title || '').trim());
+    await seedMissingByKey(
+      db.Announcement,
+      announcements,
+      'Announcement',
+      (r) => (String(r?.code || '').trim() ? String(r.code).trim() : String(r?.title || '').trim())
+    );
+    await seedMissingByKey(db.Video, videos, 'Video', (r) => String(r?.title || '').trim());
+    await seedMissingByKey(db.Publication, publications, 'Publication', (r) => String(r?.title || '').trim());
 
     process.exit(0);
   } catch (err) {
