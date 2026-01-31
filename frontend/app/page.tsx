@@ -31,7 +31,7 @@ export default function HomePage() {
                   </Link>
                 </div>
 
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {newsItems.slice(0, 6).map((item) => (
                     <NewsCard key={item.id} item={item} />
                   ))}
@@ -39,15 +39,15 @@ export default function HomePage() {
               </div>
 
               {/* Güncel Duyurular */}
-              <div className="rounded-3xl bg-soft-gray p-6">
-                <div className="mb-5 flex items-center justify-between gap-3">
+              <div className="w-full rounded-3xl bg-soft-gray p-4 sm:p-5">
+                <div className="mb-4 flex items-center justify-between gap-3">
                   <h2 className="text-lg font-bold text-slate-900">Güncel Duyurular</h2>
                   <Link href="#" className="text-sm font-semibold text-burgundy hover:text-burgundy-dark">
                     Tümünü Gör →
                   </Link>
                 </div>
 
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
                   {announcements.slice(0, 4).map((item) => (
                     <AnnouncementCard key={item.id} item={item} />
                   ))}
