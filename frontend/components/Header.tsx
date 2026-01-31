@@ -36,12 +36,12 @@ export function Header() {
         </Link>
 
         {/* Desktop Menu */}
-        <nav className="hidden items-center gap-6 lg:flex">
+        <nav className="hidden items-center gap-4 lg:flex">
           {navItems.map((item) => (
             <Link
               key={item.label}
               href={item.href}
-              className="text-sm font-medium text-slate-700 transition-colors hover:text-burgundy"
+              className="text-[13px] font-medium text-slate-700 transition-colors hover:text-burgundy xl:text-sm"
             >
               {item.label}
             </Link>
@@ -50,7 +50,7 @@ export function Header() {
 
         {/* Right side controls */}
         <div className="flex items-center gap-2">
-          <div className="hidden items-center gap-1 md:flex">
+          <div className="hidden items-center gap-1 xl:flex">
             <IconButton label="LinkedIn">
               <LinkedInIcon />
             </IconButton>
@@ -63,14 +63,13 @@ export function Header() {
           </div>
 
           {/* Language toggle */}
-          <div className="hidden items-center gap-1 rounded-full bg-soft-gray p-1 text-xs font-semibold md:flex">
+          <div className="hidden items-center gap-1 rounded-full bg-soft-gray p-1 text-xs font-semibold xl:flex">
             <button
               type="button"
               onClick={() => setLang('TR')}
               className={`rounded-full px-2 py-1 transition-colors ${
                 lang === 'TR' ? 'bg-white text-burgundy shadow-sm' : 'text-slate-500 hover:text-slate-700'
               }`}
-              aria-pressed={lang === 'TR'}
             >
               TR
             </button>
@@ -81,7 +80,6 @@ export function Header() {
               className={`rounded-full px-2 py-1 transition-colors ${
                 lang === 'EN' ? 'bg-white text-burgundy shadow-sm' : 'text-slate-500 hover:text-slate-700'
               }`}
-              aria-pressed={lang === 'EN'}
             >
               EN
             </button>

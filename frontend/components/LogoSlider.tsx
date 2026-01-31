@@ -13,11 +13,12 @@ export function LogoSlider({ logos }: Props) {
   return (
     <div className="overflow-hidden rounded-3xl bg-white p-6 shadow-card">
       <div className="relative">
-        <div className="flex w-[200%] animate-marquee gap-6">
+        {/* NOTE: Avoid fixed 200% widths to prevent horizontal overflow on some viewports */}
+        <div className="inline-flex animate-marquee gap-6 will-change-transform">
           {doubled.map((logo, idx) => (
             <div
               key={`${logo.id}-${idx}`}
-              className="group grid min-w-[170px] flex-1 place-items-center rounded-2xl border border-black/5 bg-soft-gray px-4 py-6 text-center transition-all hover:bg-white"
+              className="group grid w-[170px] shrink-0 place-items-center rounded-2xl border border-black/5 bg-soft-gray px-4 py-6 text-center transition-all hover:bg-white"
             >
               {/* Dummy “logo” as text (grayscale vibe) */}
               <div className="text-sm font-bold tracking-wide text-slate-400 grayscale transition-all group-hover:text-slate-900 group-hover:grayscale-0">
