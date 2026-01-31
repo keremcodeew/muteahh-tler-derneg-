@@ -7,6 +7,7 @@
     { "source": "/profilim", "destination": "/profilim/", "permanent": true },
     { "source": "/platform-admin", "destination": "/platform-admin/", "permanent": true },
     { "source": "/kurumsal", "destination": "/kurumsal/", "permanent": true },
+    { "source": "/uye-ol", "destination": "/uye-ol/", "permanent": true },
     { "source": "/uyelerimiz", "destination": "/uyelerimiz/", "permanent": true },
     { "source": "/duyurular", "destination": "/duyurular/", "permanent": true },
     { "source": "/haberler", "destination": "/haberler/", "permanent": true },

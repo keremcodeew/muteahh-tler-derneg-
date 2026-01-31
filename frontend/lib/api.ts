@@ -59,7 +59,12 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    const msg = (data && (data.error || data.message)) || `Request failed: ${res.status}`;
+    const firstValidationMsg =
+      data && Array.isArray(data.errors) && data.errors.length ? String(data.errors[0]?.msg ?? '') : '';
+    const msg =
+      (data && (data.error || data.message)) ||
+      (firstValidationMsg ? firstValidationMsg : null) ||
+      `Request failed: ${res.status}`;
     throw new Error(msg);
   }
   return data as T;
@@ -69,6 +74,19 @@ export async function login(email: string, password: string) {
   return await apiFetch<{ token: string; user: AuthUser; member: any }>('/api/auth/login', {
     method: 'POST',
     body: JSON.stringify({ email, password }),
+  });
+}
+
+export async function register(payload: {
+  email: string;
+  password: string;
+  name: string;
+  company?: string;
+  role?: string;
+}) {
+  return await apiFetch<{ token: string; user: AuthUser; member: any }>('/api/auth/register', {
+    method: 'POST',
+    body: JSON.stringify(payload),
   });
 }
 

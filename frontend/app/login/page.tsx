@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { PageHero } from '../../components/PageHero';
@@ -74,6 +75,13 @@ export default function LoginPage() {
             >
               {loading ? 'Giriş yapılıyor…' : 'Giriş Yap'}
             </button>
+
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-2 text-sm">
+              <Link href="/uye-ol" className="font-semibold text-burgundy hover:underline">
+                Üye Kayıt (Üye Ol)
+              </Link>
+              <span className="text-slate-500">Kayıt sonrası onay gerekir.</span>
+            </div>
           </form>
         </div>
 
