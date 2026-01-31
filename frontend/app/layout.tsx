@@ -22,8 +22,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="tr" className="w-full overflow-x-hidden" style={{ maxWidth: '100vw', overflowX: 'hidden' }}>
-      <body className={`${inter.className} w-full overflow-x-hidden`} style={{ maxWidth: '100vw', overflowX: 'hidden' }}>
+    <html lang="tr">
+      <body className={inter.className}>
         {children}
       </body>
     </html>
