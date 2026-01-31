@@ -31,7 +31,7 @@ export default function HomePage() {
                   </Link>
                 </div>
 
-                <div className="grid min-w-0 grid-cols-1 gap-3">
+                <div className="grid min-w-0 grid-cols-1 gap-2.5">
                   {newsItems.slice(0, 6).map((item) => (
                     <NewsCard key={item.id} item={item} />
                   ))}
@@ -63,7 +63,7 @@ export default function HomePage() {
                   </Link>
                 </div>
 
-                <div className="grid min-w-0 grid-cols-1 gap-3">
+                <div className="grid min-w-0 grid-cols-1 gap-2.5">
                   {videoItems.slice(0, 3).map((item) => (
                     <VideoCard key={item.id} item={item} />
                   ))}
