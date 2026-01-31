@@ -10,6 +10,9 @@ const membersRoutes = require('./routes/members');
 const slidesRoutes = require('./routes/slides');
 const videosRoutes = require('./routes/videos');
 const publicationsRoutes = require('./routes/publications');
+const pagesRoutes = require('./routes/pages');
+const eventsRoutes = require('./routes/events');
+const partnersRoutes = require('./routes/partners');
 
 const app = express();
 
@@ -31,6 +34,9 @@ app.use('/api/members', membersRoutes);
 app.use('/api/slides', slidesRoutes);
 app.use('/api/videos', videosRoutes);
 app.use('/api/publications', publicationsRoutes);
+app.use('/api/pages', pagesRoutes);
+app.use('/api/events', eventsRoutes);
+app.use('/api/partners', partnersRoutes);
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 

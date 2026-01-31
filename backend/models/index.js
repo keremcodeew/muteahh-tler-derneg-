@@ -51,6 +51,9 @@ db.Member = require('./Member')(sequelize, Sequelize);
 db.HeroSlide = require('./HeroSlide')(sequelize, Sequelize);
 db.Video = require('./Video')(sequelize, Sequelize);
 db.Publication = require('./Publication')(sequelize, Sequelize);
+db.PageContent = require('./PageContent')(sequelize, Sequelize);
+db.Event = require('./Event')(sequelize, Sequelize);
+db.Partner = require('./Partner')(sequelize, Sequelize);
 
 // Associations
 db.User.hasOne(db.Member, { foreignKey: 'userId' });

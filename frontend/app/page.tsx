@@ -10,9 +10,25 @@ import { AnnouncementCard } from '../components/AnnouncementCard';
 import { VideoCard } from '../components/VideoCard';
 import { LogoSlider } from '../components/LogoSlider';
 import { SiteFooter } from '../components/SiteFooter';
-import type { AnnouncementItem, NewsItem, SliderItem, VideoItem } from '../lib/dummyData';
-import { announcements as dummyAnnouncements, events, newsItems as dummyNews, partnerLogos, sliderItems as dummySlides, videoItems as dummyVideos } from '../lib/dummyData';
-import { listAnnouncementsRecent, listNewsPublic, listPublicationsRecent, listSlidesPublic, listVideosRecent, type Publication } from '../lib/api';
+import type { AnnouncementItem, EventItem, NewsItem, PartnerLogo, SliderItem, VideoItem } from '../lib/dummyData';
+import {
+  announcements as dummyAnnouncements,
+  events as dummyEvents,
+  newsItems as dummyNews,
+  partnerLogos as dummyPartners,
+  sliderItems as dummySlides,
+  videoItems as dummyVideos,
+} from '../lib/dummyData';
+import {
+  listAnnouncementsRecent,
+  listEventsUpcoming,
+  listNewsPublic,
+  listPartnersPublic,
+  listPublicationsRecent,
+  listSlidesPublic,
+  listVideosRecent,
+  type Publication,
+} from '../lib/api';
 
 export default function HomePage() {
   const [sliderItems, setSliderItems] = useState<SliderItem[]>(dummySlides);
@@ -20,6 +36,8 @@ export default function HomePage() {
   const [announcements, setAnnouncements] = useState<AnnouncementItem[]>(dummyAnnouncements);
   const [videoItems, setVideoItems] = useState<VideoItem[]>(dummyVideos);
   const [publications, setPublications] = useState<Publication[]>([]);
+  const [events, setEvents] = useState<EventItem[]>(dummyEvents);
+  const [partnerLogos, setPartnerLogos] = useState<PartnerLogo[]>(dummyPartners);
 
   const formatDot = useMemo(() => {
     return (iso: string | null | undefined) => {
@@ -36,12 +54,14 @@ export default function HomePage() {
 
     async function load() {
       try {
-        const [slides, news, anns, vids, pubs] = await Promise.all([
+        const [slides, news, anns, vids, pubs, upcoming, partners] = await Promise.all([
           listSlidesPublic({ limit: 8 }),
           listNewsPublic({ page: 1, limit: 6 }),
           listAnnouncementsRecent(),
           listVideosRecent({ limit: 3 }),
           listPublicationsRecent({ limit: 3 }),
+          listEventsUpcoming({ limit: 5 }),
+          listPartnersPublic({ limit: 50 }),
         ]);
         if (cancelled) return;
 
@@ -96,6 +116,28 @@ export default function HomePage() {
 
         if (Array.isArray(pubs) && pubs.length) {
           setPublications(pubs);
+        }
+
+        if (Array.isArray(upcoming)) {
+          setEvents(
+            upcoming.map((e) => ({
+              id: String(e.id),
+              title: e.title,
+              date: e.dateText || (e.eventDate ? formatDot(e.eventDate) : ''),
+              location: e.location || '',
+              color: (e.color as any) || 'burgundy',
+            }))
+          );
+        }
+
+        if (Array.isArray(partners)) {
+          setPartnerLogos(
+            partners.map((p) => ({
+              id: String(p.id),
+              name: p.title,
+              logoText: p.logoText || p.title,
+            }))
+          );
         }
       } catch {
         // Keep dummy content on any error (static layout remains unchanged)

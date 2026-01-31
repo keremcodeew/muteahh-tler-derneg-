@@ -102,6 +102,46 @@ export type Publication = {
   updatedAt?: string;
 };
 
+export type PageContent = {
+  id: number;
+  slug: string;
+  heroTitle: string | null;
+  heroSubtitle: string | null;
+  aboutTitle: string | null;
+  aboutParagraph1: string | null;
+  aboutParagraph2: string | null;
+  quickInfo: string | null; // newline separated
+  mission: string | null;
+  vision: string | null;
+  isPublished: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type Event = {
+  id: number;
+  title: string;
+  dateText: string | null;
+  eventDate: string | null; // YYYY-MM-DD
+  location: string | null;
+  color: string | null;
+  sortOrder: number;
+  isPublished: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type Partner = {
+  id: number;
+  title: string; // partner name
+  logoText: string | null;
+  logoUrl: string | null;
+  sortOrder: number;
+  isPublished: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 function isBrowser() {
   return typeof window !== 'undefined';
 }
@@ -440,6 +480,109 @@ export async function updatePublication(token: string, id: number, payload: Part
 
 export async function deletePublication(token: string, id: number) {
   return await apiFetch<{ success: true }>(`/api/publications/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+// --- Pages (Kurumsal etc.) ---
+
+export async function getPagePublic(slug: string) {
+  return await apiFetch<PageContent>(`/api/pages/${encodeURIComponent(slug)}`, { method: 'GET' });
+}
+
+export async function getPageAdmin(token: string, slug: string) {
+  return await apiFetch<PageContent | null>(`/api/pages/admin/${encodeURIComponent(slug)}`, {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function upsertPageAdmin(token: string, slug: string, payload: Partial<PageContent>) {
+  return await apiFetch<PageContent>(`/api/pages/admin/${encodeURIComponent(slug)}`, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify(payload),
+  });
+}
+
+// --- Events (Etkinlikler) ---
+
+export async function listEventsUpcoming(params?: { limit?: number }) {
+  const qs = new URLSearchParams();
+  if (params?.limit) qs.set('limit', String(params.limit));
+  return await apiFetch<Event[]>(`/api/events/upcoming${qs.toString() ? `?${qs.toString()}` : ''}`, { method: 'GET' });
+}
+
+export async function listEventsAdminAll(token: string, params?: { page?: number; limit?: number }) {
+  const qs = new URLSearchParams();
+  if (params?.page) qs.set('page', String(params.page));
+  if (params?.limit) qs.set('limit', String(params.limit));
+  return await apiFetch<PagedResponse<Event>>(`/api/events/admin/all${qs.toString() ? `?${qs.toString()}` : ''}`, {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function createEvent(token: string, payload: Partial<Event> & { title: string }) {
+  return await apiFetch<Event>('/api/events', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function updateEvent(token: string, id: number, payload: Partial<Event>) {
+  return await apiFetch<Event>(`/api/events/${id}`, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function deleteEvent(token: string, id: number) {
+  return await apiFetch<{ success: true }>(`/api/events/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+// --- Partners (Partnerler) ---
+
+export async function listPartnersPublic(params?: { limit?: number }) {
+  const qs = new URLSearchParams();
+  if (params?.limit) qs.set('limit', String(params.limit));
+  return await apiFetch<Partner[]>(`/api/partners${qs.toString() ? `?${qs.toString()}` : ''}`, { method: 'GET' });
+}
+
+export async function listPartnersAdminAll(token: string, params?: { page?: number; limit?: number }) {
+  const qs = new URLSearchParams();
+  if (params?.page) qs.set('page', String(params.page));
+  if (params?.limit) qs.set('limit', String(params.limit));
+  return await apiFetch<PagedResponse<Partner>>(`/api/partners/admin/all${qs.toString() ? `?${qs.toString()}` : ''}`, {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function createPartner(token: string, payload: Partial<Partner> & { title: string }) {
+  return await apiFetch<Partner>('/api/partners', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function updatePartner(token: string, id: number, payload: Partial<Partner>) {
+  return await apiFetch<Partner>(`/api/partners/${id}`, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function deletePartner(token: string, id: number) {
+  return await apiFetch<{ success: true }>(`/api/partners/${id}`, {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` },
   });

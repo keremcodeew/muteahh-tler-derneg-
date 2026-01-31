@@ -16,22 +16,35 @@ import {
   deletePublication,
   deleteSlide,
   deleteVideo,
+  getPageAdmin,
   getToken,
+  createEvent,
+  createPartner,
   listAnnouncementsAdminAll,
+  listEventsAdminAll,
   listMembersAdminAll,
   listNewsAdminAll,
+  listPartnersAdminAll,
   listPublicationsAdminAll,
   listSlidesAdminAll,
   listVideosAdminAll,
   me,
+  deleteEvent,
+  deletePartner,
+  updateEvent,
+  updatePartner,
+  upsertPageAdmin,
   updateAnnouncement,
   updateNews,
   updatePublication,
   updateSlide,
   updateVideo,
   type Announcement,
+  type Event,
   type HeroSlide,
   type News,
+  type PageContent,
+  type Partner,
   type Publication,
   type Video,
 } from '../../lib/api';
@@ -41,7 +54,9 @@ export default function PlatformAdminPage() {
   const [authorized, setAuthorized] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [tab, setTab] = useState<'members' | 'slides' | 'news' | 'announcements' | 'videos' | 'publications'>('members');
+  const [tab, setTab] = useState<
+    'members' | 'slides' | 'news' | 'announcements' | 'videos' | 'publications' | 'events' | 'partners' | 'kurumsal'
+  >('members');
 
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -119,6 +134,9 @@ export default function PlatformAdminPage() {
             <TabButton active={tab === 'announcements'} onClick={() => setTab('announcements')}>Duyurular</TabButton>
             <TabButton active={tab === 'videos'} onClick={() => setTab('videos')}>Videolar</TabButton>
             <TabButton active={tab === 'publications'} onClick={() => setTab('publications')}>Yayınlar</TabButton>
+            <TabButton active={tab === 'events'} onClick={() => setTab('events')}>Etkinlikler</TabButton>
+            <TabButton active={tab === 'partners'} onClick={() => setTab('partners')}>Partnerler</TabButton>
+            <TabButton active={tab === 'kurumsal'} onClick={() => setTab('kurumsal')}>Kurumsal</TabButton>
           </div>
 
           <div className="mt-6">
@@ -140,8 +158,14 @@ export default function PlatformAdminPage() {
               <AnnouncementsPanel token={token} />
             ) : tab === 'videos' ? (
               <VideosPanel token={token} />
-            ) : (
+            ) : tab === 'publications' ? (
               <PublicationsPanel token={token} />
+            ) : tab === 'events' ? (
+              <EventsPanel token={token} />
+            ) : tab === 'partners' ? (
+              <PartnersPanel token={token} />
+            ) : (
+              <KurumsalPanel token={token} />
             )}
           </div>
         </section>
@@ -214,6 +238,145 @@ function getPublishedValue(obj: any): boolean {
   if (typeof obj.isPublished === 'boolean') return obj.isPublished;
   if (typeof obj.is_published === 'boolean') return obj.is_published;
   return Boolean(obj.isPublished ?? obj.is_published);
+}
+
+function KurumsalPanel({ token }: { token: string | null }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [savedMsg, setSavedMsg] = useState<string | null>(null);
+
+  const [form, setForm] = useState<Partial<PageContent>>({
+    heroTitle: 'Kurumsal',
+    heroSubtitle: 'Derneğimizin vizyonu, misyonu ve kurumsal yapısına dair genel bilgiler.',
+    aboutTitle: 'Hakkımızda',
+    aboutParagraph1: '',
+    aboutParagraph2: '',
+    quickInfo: 'Kuruluş: 20XX\nMerkez: Antalya\nÇalışma Alanı: İnşaat ve müteahhitlik\nÜyelik: Başvuru + Onay',
+    mission: '',
+    vision: '',
+    isPublished: true,
+  });
+
+  async function load() {
+    if (!token) return;
+    setLoading(true);
+    setError(null);
+    setSavedMsg(null);
+    try {
+      const res = await getPageAdmin(token, 'kurumsal');
+      if (res) setForm(res);
+    } catch (e: any) {
+      setError(e?.message ?? 'Kurumsal içerik yüklenemedi.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
+
+  return (
+    <div>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h2 className="text-lg font-bold text-slate-900">Kurumsal Sayfası</h2>
+          <p className="mt-1 text-sm text-slate-600">`/kurumsal` sayfasındaki metin alanlarını buradan yönetebilirsiniz.</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={load}
+            disabled={!token || loading}
+            className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-slate-700 disabled:opacity-50"
+          >
+            Yenile
+          </button>
+          <button
+            type="button"
+            onClick={async () => {
+              if (!token) return;
+              setLoading(true);
+              setError(null);
+              setSavedMsg(null);
+              try {
+                await upsertPageAdmin(token, 'kurumsal', {
+                  heroTitle: (form.heroTitle ?? '').toString().trim() || null,
+                  heroSubtitle: (form.heroSubtitle ?? '').toString().trim() || null,
+                  aboutTitle: (form.aboutTitle ?? '').toString().trim() || null,
+                  aboutParagraph1: (form.aboutParagraph1 ?? '').toString().trim() || null,
+                  aboutParagraph2: (form.aboutParagraph2 ?? '').toString().trim() || null,
+                  quickInfo: (form.quickInfo ?? '').toString().trim() || null,
+                  mission: (form.mission ?? '').toString().trim() || null,
+                  vision: (form.vision ?? '').toString().trim() || null,
+                  isPublished: !!form.isPublished,
+                });
+                setSavedMsg('Kaydedildi.');
+              } catch (e: any) {
+                setError(e?.message ?? 'Kaydetme başarısız.');
+              } finally {
+                setLoading(false);
+              }
+            }}
+            disabled={!token || loading}
+            className="rounded-full bg-burgundy px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          >
+            Kaydet
+          </button>
+        </div>
+      </div>
+
+      {error ? <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
+      {savedMsg ? <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{savedMsg}</div> : null}
+
+      <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+        <Field label="Hero Başlık">
+          <TextInput value={String(form.heroTitle ?? '')} onChange={(e) => setForm((s) => ({ ...s, heroTitle: e.target.value }))} />
+        </Field>
+        <Field label="Hero Alt Başlık">
+          <TextInput value={String(form.heroSubtitle ?? '')} onChange={(e) => setForm((s) => ({ ...s, heroSubtitle: e.target.value }))} />
+        </Field>
+
+        <Field label="Hakkımızda Başlık">
+          <TextInput value={String(form.aboutTitle ?? '')} onChange={(e) => setForm((s) => ({ ...s, aboutTitle: e.target.value }))} />
+        </Field>
+        <Field label="Durum">
+          <Toggle value={!!form.isPublished} onChange={(v) => setForm((s) => ({ ...s, isPublished: v }))} />
+        </Field>
+
+        <div className="md:col-span-2">
+          <Field label="Hakkımızda Paragraf 1">
+            <TextArea rows={4} value={String(form.aboutParagraph1 ?? '')} onChange={(e) => setForm((s) => ({ ...s, aboutParagraph1: e.target.value }))} />
+          </Field>
+        </div>
+
+        <div className="md:col-span-2">
+          <Field label="Hakkımızda Paragraf 2">
+            <TextArea rows={4} value={String(form.aboutParagraph2 ?? '')} onChange={(e) => setForm((s) => ({ ...s, aboutParagraph2: e.target.value }))} />
+          </Field>
+        </div>
+
+        <div className="md:col-span-2">
+          <Field label="Hızlı Bilgiler (her satır bir madde)">
+            <TextArea rows={4} value={String(form.quickInfo ?? '')} onChange={(e) => setForm((s) => ({ ...s, quickInfo: e.target.value }))} />
+          </Field>
+        </div>
+
+        <div className="md:col-span-1">
+          <Field label="Misyon">
+            <TextArea rows={4} value={String(form.mission ?? '')} onChange={(e) => setForm((s) => ({ ...s, mission: e.target.value }))} />
+          </Field>
+        </div>
+
+        <div className="md:col-span-1">
+          <Field label="Vizyon">
+            <TextArea rows={4} value={String(form.vision ?? '')} onChange={(e) => setForm((s) => ({ ...s, vision: e.target.value }))} />
+          </Field>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function MembersPanel({
@@ -676,6 +839,48 @@ function PublicationsPanel({ token }: { token: string | null }) {
       { key: 'excerpt', label: 'Özet', type: 'textarea' },
     ]}
   />;
+}
+
+function EventsPanel({ token }: { token: string | null }) {
+  return (
+    <GenericContentPanel<Event>
+      token={token}
+      title="Etkinlik Yönetimi"
+      subtitle="Ana sayfadaki Etkinlikler (sidebar) listesi buradan yönetilir."
+      list={(t) => listEventsAdminAll(t, { page: 1, limit: 200 })}
+      create={(t, p) => createEvent(t, p as any)}
+      update={(t, id, p) => updateEvent(t, id, p as any)}
+      remove={(t, id) => deleteEvent(t, id)}
+      fields={[
+        { key: 'title', label: 'Başlık', type: 'text', required: true },
+        { key: 'dateText', label: 'Tarih Yazısı (örn: 02 Şubat 2026)', type: 'text' },
+        { key: 'eventDate', label: 'Tarih (YYYY-MM-DD) (opsiyonel)', type: 'text' },
+        { key: 'location', label: 'Konum', type: 'text' },
+        { key: 'color', label: 'Renk (burgundy/green/blue)', type: 'text' },
+        { key: 'sortOrder', label: 'Sıralama', type: 'text' },
+      ]}
+    />
+  );
+}
+
+function PartnersPanel({ token }: { token: string | null }) {
+  return (
+    <GenericContentPanel<Partner>
+      token={token}
+      title="Partner Yönetimi"
+      subtitle="Ana sayfadaki Üyelikler / Partnerler logo alanı buradan yönetilir."
+      list={(t) => listPartnersAdminAll(t, { page: 1, limit: 200 })}
+      create={(t, p) => createPartner(t, p as any)}
+      update={(t, id, p) => updatePartner(t, id, p as any)}
+      remove={(t, id) => deletePartner(t, id)}
+      fields={[
+        { key: 'title', label: 'Partner Adı', type: 'text', required: true },
+        { key: 'logoText', label: 'Logo Yazısı (UI)', type: 'text' },
+        { key: 'logoUrl', label: 'Logo URL (opsiyonel)', type: 'text' },
+        { key: 'sortOrder', label: 'Sıralama', type: 'text' },
+      ]}
+    />
+  );
 }
 
 type GenericField = { key: string; label: string; type: 'text' | 'textarea'; required?: boolean };
