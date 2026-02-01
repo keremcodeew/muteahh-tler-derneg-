@@ -472,6 +472,14 @@ function MembersPanel({
     }
   }
 
+  function formatBytes(bytes: number) {
+    if (!bytes || bytes <= 0) return '0 B';
+    const units = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+    const v = bytes / Math.pow(1024, i);
+    return `${v >= 10 ? Math.round(v) : Math.round(v * 10) / 10} ${units[i]}`;
+  }
+
   function canApproveMember(d: typeof docsData) {
     if (!d) return false;
     const byKind = new Map<string, MemberDocument>();
@@ -641,6 +649,13 @@ function MembersPanel({
                               <div className="text-sm font-bold text-slate-900">{kind}</div>
                               <div className="mt-1 text-xs text-slate-600">
                                 Durum: <span className="font-semibold">{doc?.status || 'Eksik'}</span>
+                              </div>
+                              <div className="mt-1 text-xs text-slate-600">
+                                Dosya: <span className="font-semibold">{doc?.filename || '—'}</span>
+                              </div>
+                              <div className="mt-1 text-xs text-slate-600">
+                                Tür: <span className="font-semibold">{doc?.mimeType || '—'}</span>
+                                {doc?.sizeBytes ? <span className="text-slate-500"> • {formatBytes(doc.sizeBytes)}</span> : null}
                               </div>
                               {doc?.reviewerNote ? <div className="mt-1 text-xs text-slate-600">Not: {doc.reviewerNote}</div> : null}
                             </div>
