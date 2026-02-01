@@ -12,7 +12,7 @@ export function Header() {
       { href: '/', label: 'Ana Sayfa' },
       { href: '/kurumsal', label: 'Kurumsal' },
       { href: '/uyelerimiz', label: 'Üyelerimiz' },
-      { href: '/duyurular', label: 'Duyurular' },
+      { href: '/duyurular', label: 'Hakkımızda' },
       { href: '/haberler', label: 'Haberler' },
       { href: '/yayinlar', label: 'Yayınlar' },
       { href: '/iletisim', label: 'İletişim' },

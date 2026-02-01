@@ -27,6 +27,12 @@ module.exports = (sequelize, DataTypes) => {
       aboutParagraph2: {
         type: DataTypes.TEXT,
       },
+      aboutPdfTitle: {
+        type: DataTypes.STRING(255),
+      },
+      aboutPdfUrl: {
+        type: DataTypes.STRING(500),
+      },
       quickInfo: {
         // newline-separated bullet lines
         type: DataTypes.TEXT,

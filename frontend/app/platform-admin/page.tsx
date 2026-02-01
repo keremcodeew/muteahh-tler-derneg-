@@ -266,6 +266,8 @@ function KurumsalPanel({ token }: { token: string | null }) {
     aboutTitle: 'Hakkımızda',
     aboutParagraph1: '',
     aboutParagraph2: '',
+    aboutPdfTitle: 'Dernek Tanıtım Dosyası',
+    aboutPdfUrl: '',
     quickInfo: 'Kuruluş: 20XX\nMerkez: Antalya\nÇalışma Alanı: İnşaat ve müteahhitlik\nÜyelik: Başvuru + Onay',
     mission: '',
     vision: '',
@@ -322,6 +324,8 @@ function KurumsalPanel({ token }: { token: string | null }) {
                   aboutTitle: (form.aboutTitle ?? '').toString().trim() || null,
                   aboutParagraph1: (form.aboutParagraph1 ?? '').toString().trim() || null,
                   aboutParagraph2: (form.aboutParagraph2 ?? '').toString().trim() || null,
+                  aboutPdfTitle: (form.aboutPdfTitle ?? '').toString().trim() || null,
+                  aboutPdfUrl: (form.aboutPdfUrl ?? '').toString().trim() || null,
                   quickInfo: (form.quickInfo ?? '').toString().trim() || null,
                   mission: (form.mission ?? '').toString().trim() || null,
                   vision: (form.vision ?? '').toString().trim() || null,
@@ -371,6 +375,21 @@ function KurumsalPanel({ token }: { token: string | null }) {
             <TextArea rows={4} value={String(form.aboutParagraph2 ?? '')} onChange={(e) => setForm((s) => ({ ...s, aboutParagraph2: e.target.value }))} />
           </Field>
         </div>
+
+        <Field label="Hakkımızda PDF Başlık">
+          <TextInput
+            value={String(form.aboutPdfTitle ?? '')}
+            onChange={(e) => setForm((s) => ({ ...s, aboutPdfTitle: e.target.value }))}
+            placeholder="Örn: Dernek Tanıtım Dosyası"
+          />
+        </Field>
+        <Field label="Hakkımızda PDF URL">
+          <TextInput
+            value={String(form.aboutPdfUrl ?? '')}
+            onChange={(e) => setForm((s) => ({ ...s, aboutPdfUrl: e.target.value }))}
+            placeholder="https://.../dosya.pdf"
+          />
+        </Field>
 
         <div className="md:col-span-2">
           <Field label="Hızlı Bilgiler (her satır bir madde)">

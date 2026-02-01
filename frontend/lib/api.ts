@@ -150,6 +150,8 @@ export type PageContent = {
   aboutTitle: string | null;
   aboutParagraph1: string | null;
   aboutParagraph2: string | null;
+  aboutPdfTitle?: string | null;
+  aboutPdfUrl?: string | null;
   quickInfo: string | null; // newline separated
   mission: string | null;
   vision: string | null;

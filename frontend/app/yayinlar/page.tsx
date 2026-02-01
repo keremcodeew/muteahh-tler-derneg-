@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { PageHero } from '../../components/PageHero';
 import { PageLayoutWithFooter } from '../../components/PageLayout';
+import { PdfPreviewModal } from '../../components/PdfPreviewModal';
 import { listPublicationsPublic, type Publication } from '../../lib/api';
 
 function formatDot(iso: string | null | undefined) {
@@ -16,6 +17,7 @@ function formatDot(iso: string | null | undefined) {
 export default function PublicationsPage() {
   const [items, setItems] = useState<Publication[]>([]);
   const [loading, setLoading] = useState(false);
+  const [preview, setPreview] = useState<{ url: string; title: string } | null>(null);
 
   const load = useMemo(() => {
     return async () => {
@@ -51,18 +53,40 @@ export default function PublicationsPage() {
               <p className="text-xs font-semibold text-slate-500">{formatDot(p.publishDate)}</p>
               <h3 className="mt-2 text-sm font-bold text-slate-900">{p.title}</h3>
               <p className="mt-2 text-sm text-slate-600">{p.excerpt || ''}</p>
-              <a
-                href={p.fileUrl || '#'}
-                className="mt-4 inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-soft-gray"
-              >
-                PDF İndir
-              </a>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <a
+                  href={p.fileUrl || '#'}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-soft-gray"
+                >
+                  PDF İndir
+                </a>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!p.fileUrl) return;
+                    setPreview({ url: p.fileUrl, title: p.title });
+                  }}
+                  disabled={!p.fileUrl}
+                  className="inline-flex rounded-full bg-burgundy px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-burgundy-dark disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  ÖNİZLEME
+                </button>
+              </div>
             </div>
           ))}
         </div>
 
         {loading ? <div className="mt-6 text-sm text-slate-500">Yükleniyor…</div> : null}
       </section>
+
+      <PdfPreviewModal
+        open={!!preview}
+        url={preview?.url ?? null}
+        title={preview?.title}
+        onClose={() => setPreview(null)}
+      />
     </PageLayoutWithFooter>
   );
 }
