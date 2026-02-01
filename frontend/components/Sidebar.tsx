@@ -8,9 +8,10 @@ import { listMembersPublic } from '../lib/api';
 
 type Props = {
   events: EventItem[];
+  loadingEvents?: boolean;
 };
 
-export function Sidebar({ events }: Props) {
+export function Sidebar({ events, loadingEvents }: Props) {
   const router = useRouter();
 
   const memberTypes = useMemo(
@@ -149,26 +150,47 @@ export function Sidebar({ events }: Props) {
         </div>
 
         <ul className="mt-4 space-y-3">
-          {events.map((e) => (
-            <li key={e.id} className="flex items-start justify-between gap-3">
-              <div className="flex min-w-0 items-start gap-3">
-                <span className={`mt-1 inline-block size-3 shrink-0 rounded-full ${dotColor(e.color)}`} />
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-slate-900 line-clamp-2">{e.title}</p>
-                  <p className="mt-0.5 text-xs text-slate-500">
-                    {e.date} • {e.location}
-                  </p>
+          {loadingEvents ? (
+            <>
+              {[0, 1, 2].map((i) => (
+                <li key={i} className="flex items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-start gap-3">
+                    <span className="mt-1 inline-block size-3 shrink-0 rounded-full bg-slate-300" />
+                    <div className="min-w-0 flex-1">
+                      <div className="h-4 w-10/12 animate-pulse rounded bg-slate-200" />
+                      <div className="mt-2 h-3 w-7/12 animate-pulse rounded bg-slate-200" />
+                    </div>
+                  </div>
+                  <div className="grid size-8 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-300">
+                    <SmallArrow />
+                  </div>
+                </li>
+              ))}
+            </>
+          ) : events.length ? (
+            events.map((e) => (
+              <li key={e.id} className="flex items-start justify-between gap-3">
+                <div className="flex min-w-0 items-start gap-3">
+                  <span className={`mt-1 inline-block size-3 shrink-0 rounded-full ${dotColor(e.color)}`} />
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-slate-900 line-clamp-2">{e.title}</p>
+                    <p className="mt-0.5 text-xs text-slate-500">
+                      {e.date} • {e.location}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <button
-                type="button"
-                className="grid size-8 shrink-0 place-items-center rounded-full bg-emerald-100 text-emerald-700 transition-colors hover:bg-emerald-200"
-                aria-label="Aç"
-              >
-                <SmallArrow />
-              </button>
-            </li>
-          ))}
+                <button
+                  type="button"
+                  className="grid size-8 shrink-0 place-items-center rounded-full bg-emerald-100 text-emerald-700 transition-colors hover:bg-emerald-200"
+                  aria-label="Aç"
+                >
+                  <SmallArrow />
+                </button>
+              </li>
+            ))
+          ) : (
+            <li className="text-sm text-slate-600">Etkinlik bulunamadı.</li>
+          )}
         </ul>
       </div>
     </aside>

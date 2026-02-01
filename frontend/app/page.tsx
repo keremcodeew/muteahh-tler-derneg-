@@ -14,7 +14,6 @@ import { SiteFooter } from '../components/SiteFooter';
 import type { AnnouncementItem, EventItem, NewsItem, PartnerLogo, SliderItem, VideoItem } from '../lib/dummyData';
 import {
   announcements as dummyAnnouncements,
-  events as dummyEvents,
   newsItems as dummyNews,
   partnerLogos as dummyPartners,
   sliderItems as dummySlides,
@@ -41,7 +40,8 @@ export default function HomePage() {
   const [announcements, setAnnouncements] = useState<AnnouncementItem[]>(dummyAnnouncements);
   const [videoItems, setVideoItems] = useState<VideoItem[]>(dummyVideos);
   const [publications, setPublications] = useState<Publication[]>([]);
-  const [events, setEvents] = useState<EventItem[]>(dummyEvents);
+  const [events, setEvents] = useState<EventItem[]>([]);
+  const [eventsLoading, setEventsLoading] = useState(true);
   const [partnerLogos, setPartnerLogos] = useState<PartnerLogo[]>(dummyPartners);
 
   const formatDot = useMemo(() => {
@@ -164,6 +164,11 @@ export default function HomePage() {
               color: (e.color as any) || 'burgundy',
             }))
           );
+          setEventsLoading(false);
+        } else {
+          // Do not show dummy events; keep empty.
+          setEvents([]);
+          setEventsLoading(false);
         }
 
         if (Array.isArray(partners)) {
@@ -178,6 +183,7 @@ export default function HomePage() {
       } catch {
         // Keep dummy content on any error (static layout remains unchanged)
         setBannerLoading(false);
+        setEventsLoading(false);
       }
     }
 
@@ -301,7 +307,7 @@ export default function HomePage() {
             {/* Sidebar (desktop sticky) - mobile'da aşağı iner */}
             <div>
               <div className="lg:sticky lg:top-24">
-                <Sidebar events={events} />
+                <Sidebar events={events} loadingEvents={eventsLoading} />
               </div>
             </div>
           </div>
