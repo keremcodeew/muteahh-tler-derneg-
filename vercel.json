@@ -11,6 +11,7 @@
     { "source": "/uyelerimiz", "destination": "/uyelerimiz/", "permanent": true },
     { "source": "/duyurular", "destination": "/duyurular/", "permanent": true },
     { "source": "/haberler", "destination": "/haberler/", "permanent": true },
+    { "source": "/haberler/detay", "destination": "/haberler/detay/", "permanent": true },
     { "source": "/videolar", "destination": "/videolar/", "permanent": true },
     { "source": "/etkinlikler", "destination": "/etkinlikler/", "permanent": true },
     { "source": "/yayinlar", "destination": "/yayinlar/", "permanent": true },

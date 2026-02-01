@@ -2,9 +2,8 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { PageLayoutWithFooter } from '../../../components/PageLayout';
 import { getNewsById, type News } from '../../../lib/api';
 
 function formatDot(iso: string | null | undefined) {
@@ -14,9 +13,9 @@ function formatDot(iso: string | null | undefined) {
   return `${parts[2]}.${parts[1]}.${parts[0]}`;
 }
 
-export default function NewsDetailPage() {
-  const params = useParams<{ id: string }>();
-  const id = params?.id ? String(params.id) : '';
+export function NewsDetailClient() {
+  const sp = useSearchParams();
+  const id = sp.get('id') || '';
 
   const [item, setItem] = useState<News | null>(null);
   const [loading, setLoading] = useState(true);
@@ -25,14 +24,19 @@ export default function NewsDetailPage() {
   const title = item?.title || 'Haber';
   const dateText = item?.publishDate ? formatDot(item.publishDate) : '';
 
-  const contentLines = useMemo(() => {
-    const c = item?.content ? String(item.content) : '';
-    return c;
+  const contentText = useMemo(() => {
+    return item?.content ? String(item.content) : '';
   }, [item?.content]);
 
   useEffect(() => {
     let cancelled = false;
     async function load() {
+      if (!id) {
+        setItem(null);
+        setError('Haber bulunamadı.');
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       setError(null);
       try {
@@ -47,14 +51,14 @@ export default function NewsDetailPage() {
         setLoading(false);
       }
     }
-    if (id) load();
+    load();
     return () => {
       cancelled = true;
     };
   }, [id]);
 
   return (
-    <PageLayoutWithFooter>
+    <>
       <section className="rounded-3xl bg-slate-900 p-6 shadow-card sm:p-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="text-xs font-semibold text-white/70">Antalya Müteahhitler Derneği</div>
@@ -94,12 +98,12 @@ export default function NewsDetailPage() {
             </div>
             <div className="p-6 sm:p-8">
               {item.excerpt ? <p className="text-sm text-slate-600">{item.excerpt}</p> : null}
-              <div className="mt-5 whitespace-pre-wrap text-sm leading-relaxed text-slate-800">{contentLines}</div>
+              <div className="mt-5 whitespace-pre-wrap text-sm leading-relaxed text-slate-800">{contentText}</div>
             </div>
           </div>
         )}
       </section>
-    </PageLayoutWithFooter>
+    </>
   );
 }
 
