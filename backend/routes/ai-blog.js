@@ -29,9 +29,9 @@ function safeJsonParse(s) {
   }
 }
 
-async function callOpenAIJson({ title, language, tone, maxWords, keywords }) {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) throw new Error('OPENAI_API_KEY must be set.');
+async function callGeminiJson({ title, language, tone, maxWords, keywords }) {
+  const apiKey = process.env.GOOGLE_AI_STUDIO_API_KEY || process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error('GOOGLE_AI_STUDIO_API_KEY (or GEMINI_API_KEY) must be set.');
 
   const prompt = {
     title,
@@ -53,28 +53,31 @@ Keywords (optional): ${(prompt.keywords || []).join(', ')}
 
 Output JSON only.`;
 
-  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+  const model = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+
+  const res = await fetch(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
-      temperature: 0.7,
-      response_format: { type: 'json_object' },
-      messages: [
-        { role: 'system', content: sys },
-        { role: 'user', content: user },
-      ],
+      systemInstruction: { parts: [{ text: sys }] },
+      contents: [{ role: 'user', parts: [{ text: user }] }],
+      generationConfig: {
+        temperature: 0.7,
+        responseMimeType: 'application/json',
+      },
     }),
   });
 
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    throw new Error((data && (data.error?.message || data.error || data.message)) || `OpenAI error: ${res.status}`);
+    const msg =
+      (data && (data.error?.message || data.error || data.message)) ||
+      `Gemini error: ${res.status}`;
+    throw new Error(msg);
   }
-  const text = data?.choices?.[0]?.message?.content || '';
+
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
   const parsed = safeJsonParse(text);
   if (!parsed || !parsed.contentMarkdown) throw new Error('AI output parse failed.');
   return parsed;
@@ -93,7 +96,7 @@ async function runDueTasks({ max = 5 } = {}) {
     try {
       await task.update({ status: 'running', startedAt: new Date(), lastError: null });
       const settings = safeJsonParse(task.settingsJson || '') || {};
-      const ai = await callOpenAIJson({
+      const ai = await callGeminiJson({
         title: task.title,
         language: settings.language || 'tr',
         tone: settings.tone || 'kurumsal',

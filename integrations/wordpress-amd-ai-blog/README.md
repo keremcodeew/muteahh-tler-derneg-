@@ -1,6 +1,6 @@
 ## AMD AI Blog Scheduler (WordPress Plugin)
 
-Bu klasör, **WordPress sitelerde** başlık + tarih/saat girerek **OpenAI ile otomatik blog yazısı üretip yayınlayan** basit bir plugin örneğidir.
+Bu klasör, **WordPress sitelerde** başlık + tarih/saat girerek **Google AI Studio (Gemini) ile otomatik blog yazısı üretip yayınlayan** basit bir plugin örneğidir.
 
 ### Kurulum
 
@@ -13,8 +13,8 @@ Bu klasör, **WordPress sitelerde** başlık + tarih/saat girerek **OpenAI ile o
 
 WordPress Admin menüsünde **AMD AI Blog** sayfasından:
 
-- OpenAI API Key
-- Model (varsayılan `gpt-4o-mini`)
+- Google AI Studio (Gemini) API Key
+- Model (varsayılan `gemini-1.5-flash`)
 
 ### Zamanlama
 

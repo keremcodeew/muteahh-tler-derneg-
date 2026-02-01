@@ -9,12 +9,12 @@ Bu repo içinde iki seçenek vardır:
 
 2) **WordPress eklentisi (örnek / başlangıç paketi)**
 - `integrations/wordpress-amd-ai-blog/` altında basit bir WordPress plugin iskeleti bulunur.
-- Bu eklenti doğrudan OpenAI API çağırarak WP içinde yazı oluşturur (başka bir backend’e ihtiyaç duymaz).
+- Bu eklenti doğrudan **Google AI Studio (Gemini) API** çağırarak WP içinde yazı oluşturur (başka bir backend’e ihtiyaç duymaz).
 
 ### Gerekli ortam değişkenleri (bu proje)
 
-- **`OPENAI_API_KEY`**: Blog içeriği üretimi için zorunlu.
-- **`OPENAI_MODEL`** (opsiyonel): Varsayılan `gpt-4o-mini`.
+- **`GOOGLE_AI_STUDIO_API_KEY`** (veya **`GEMINI_API_KEY`**): Blog içeriği üretimi için zorunlu.
+- **`GEMINI_MODEL`** (opsiyonel): Varsayılan `gemini-1.5-flash`.
 - **`CRON_SECRET`** (opsiyonel): Eğer Vercel Cron dışı bir cron ile çağıracaksanız ek güvenlik için.
 
 ### Cron endpoint
@@ -31,6 +31,6 @@ Hobby planda daha sık çalıştırmak isterseniz:
 
 ### Özel yazılımlar (custom code) için önerilen yöntem
 
-En güvenlisi: kendi backend’inizde (server-side) OpenAI çağrısını yapıp içeriği sitenizde yayınlamaktır.
+En güvenlisi: kendi backend’inizde (server-side) Gemini çağrısını yapıp içeriği sitenizde yayınlamaktır.
 Bu projedeki `/api/ai-blog/*` route’ları örnek bir referanstır.
 

@@ -52,8 +52,8 @@ function amd_ai_blog_admin_page() {
   // Save settings
   if (isset($_POST['amd_ai_blog_save_settings'])) {
     check_admin_referer('amd_ai_blog_settings');
-    $opts['openai_api_key'] = sanitize_text_field($_POST['openai_api_key']);
-    $opts['openai_model'] = sanitize_text_field($_POST['openai_model']);
+    $opts['gemini_api_key'] = sanitize_text_field($_POST['gemini_api_key']);
+    $opts['gemini_model'] = sanitize_text_field($_POST['gemini_model']);
     amd_ai_blog_save_opts($opts);
     echo '<div class="updated"><p>Ayarlar kaydedildi.</p></div>';
   }
@@ -108,12 +108,12 @@ function amd_ai_blog_admin_page() {
       <?php wp_nonce_field('amd_ai_blog_settings'); ?>
       <table class="form-table">
         <tr>
-          <th scope="row">OpenAI API Key</th>
-          <td><input type="password" name="openai_api_key" value="<?php echo esc_attr(isset($opts['openai_api_key']) ? $opts['openai_api_key'] : ''); ?>" class="regular-text" /></td>
+          <th scope="row">Google AI Studio (Gemini) API Key</th>
+          <td><input type="password" name="gemini_api_key" value="<?php echo esc_attr(isset($opts['gemini_api_key']) ? $opts['gemini_api_key'] : ''); ?>" class="regular-text" /></td>
         </tr>
         <tr>
           <th scope="row">Model</th>
-          <td><input type="text" name="openai_model" value="<?php echo esc_attr(isset($opts['openai_model']) ? $opts['openai_model'] : 'gpt-4o-mini'); ?>" class="regular-text" /></td>
+          <td><input type="text" name="gemini_model" value="<?php echo esc_attr(isset($opts['gemini_model']) ? $opts['gemini_model'] : 'gemini-1.5-flash'); ?>" class="regular-text" /></td>
         </tr>
       </table>
       <p><button type="submit" name="amd_ai_blog_save_settings" class="button button-primary">Kaydet</button></p>
@@ -206,10 +206,10 @@ add_action(AMD_AI_BLOG_CRON_HOOK, 'amd_ai_blog_run_due');
 
 function amd_ai_blog_run_due() {
   $opts = amd_ai_blog_get_opts();
-  $api_key = isset($opts['openai_api_key']) ? $opts['openai_api_key'] : '';
+  $api_key = isset($opts['gemini_api_key']) ? $opts['gemini_api_key'] : '';
   if (!$api_key) return;
 
-  $model = isset($opts['openai_model']) && $opts['openai_model'] ? $opts['openai_model'] : 'gpt-4o-mini';
+  $model = isset($opts['gemini_model']) && $opts['gemini_model'] ? $opts['gemini_model'] : 'gemini-1.5-flash';
   $tasks = amd_ai_blog_get_tasks();
 
   $now = current_time('timestamp'); // WP timezone
@@ -256,18 +256,19 @@ function amd_ai_blog_generate_post($api_key, $model, $title) {
   $sys = "You are an expert Turkish corporate content writer. Write original content. Use headings and lists.";
   $user = "Topic: " . $title . "\nLanguage: tr\nTone: kurumsal, bilgilendirici\nReturn Markdown.";
 
-  $resp = wp_remote_post('https://api.openai.com/v1/chat/completions', array(
+  $url = 'https://generativelanguage.googleapis.com/v1beta/models/' . rawurlencode($model) . ':generateContent?key=' . rawurlencode($api_key);
+  $resp = wp_remote_post($url, array(
     'timeout' => 60,
     'headers' => array(
       'Content-Type' => 'application/json',
-      'Authorization' => 'Bearer ' . $api_key,
     ),
     'body' => wp_json_encode(array(
-      'model' => $model,
-      'temperature' => 0.7,
-      'messages' => array(
-        array('role' => 'system', 'content' => $sys),
-        array('role' => 'user', 'content' => $user),
+      'systemInstruction' => array('parts' => array(array('text' => $sys))),
+      'contents' => array(
+        array('role' => 'user', 'parts' => array(array('text' => $user))),
+      ),
+      'generationConfig' => array(
+        'temperature' => 0.7,
       ),
     )),
   ));
@@ -277,11 +278,14 @@ function amd_ai_blog_generate_post($api_key, $model, $title) {
   $body = wp_remote_retrieve_body($resp);
   $data = json_decode($body, true);
   if ($code < 200 || $code >= 300) {
-    $msg = isset($data['error']['message']) ? $data['error']['message'] : 'OpenAI error';
-    return new WP_Error('openai_error', $msg);
+    $msg = isset($data['error']['message']) ? $data['error']['message'] : 'Gemini error';
+    return new WP_Error('gemini_error', $msg);
   }
-  $text = isset($data['choices'][0]['message']['content']) ? $data['choices'][0]['message']['content'] : '';
-  if (!$text) return new WP_Error('openai_empty', 'OpenAI boş çıktı döndü.');
+  $text = '';
+  if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
+    $text = $data['candidates'][0]['content']['parts'][0]['text'];
+  }
+  if (!$text) return new WP_Error('gemini_empty', 'Gemini boş çıktı döndü.');
   return $text;
 }
 

@@ -825,7 +825,8 @@ function AiBlogPanel({ token }: { token: string | null }) {
             Başlık + tarih/saat ayarlayın. Zamanı gelince sistem otomatik blog yazısı üretip yayınlar.
           </p>
           <p className="mt-1 text-xs text-slate-500">
-            Not: AI üretimi için backend’de <span className="font-semibold">OPENAI_API_KEY</span> tanımlı olmalı.
+            Not: AI üretimi için backend’de <span className="font-semibold">GOOGLE_AI_STUDIO_API_KEY</span> (veya{' '}
+            <span className="font-semibold">GEMINI_API_KEY</span>) tanımlı olmalı.
           </p>
         </div>
 
