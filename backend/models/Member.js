@@ -35,6 +35,29 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    verificationStatus: {
+      // pending_docs | under_review | resubmit_required | rejected | approved
+      type: DataTypes.STRING(32),
+      defaultValue: 'pending_docs',
+    },
+    verificationNote: {
+      type: DataTypes.TEXT,
+    },
+    phoneCountryCode: {
+      type: DataTypes.STRING(8),
+    },
+    phoneNumber: {
+      type: DataTypes.STRING(32),
+    },
+    phoneE164: {
+      type: DataTypes.STRING(32),
+    },
+    kvkkAcceptedAt: {
+      type: DataTypes.DATE,
+    },
+    termsAcceptedAt: {
+      type: DataTypes.DATE,
+    },
   }, {
     tableName: 'members',
     timestamps: true,

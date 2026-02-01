@@ -12,12 +12,14 @@ import {
   createSlide,
   createVideo,
   deleteAnnouncement,
+  deleteMember,
   deleteNews,
   deletePublication,
   deleteSlide,
   deleteVideo,
   getPageAdmin,
   getToken,
+  listMemberDocumentsAdmin,
   createEvent,
   createPartner,
   listAnnouncementsAdminAll,
@@ -31,6 +33,10 @@ import {
   me,
   deleteEvent,
   deletePartner,
+  documentDownloadUrl,
+  rejectMember,
+  requestMemberResubmission,
+  reviewMemberDocumentAdmin,
   updateEvent,
   updatePartner,
   upsertPageAdmin,
@@ -44,6 +50,7 @@ import {
   type HeroSlide,
   type News,
   type PageContent,
+  type MemberDocument,
   type Partner,
   type Publication,
   type Video,
@@ -396,6 +403,45 @@ function MembersPanel({
   refresh: () => Promise<void>;
   approve: (token: string, memberId: number) => Promise<any>;
 }) {
+  const [docsOpen, setDocsOpen] = useState(false);
+  const [docsLoading, setDocsLoading] = useState(false);
+  const [docsData, setDocsData] = useState<null | { member: any; requiredKinds: string[]; items: MemberDocument[] }>(null);
+  const [memberActionNote, setMemberActionNote] = useState('');
+
+  async function openDocs(memberId: number) {
+    if (!token) return;
+    setDocsOpen(true);
+    setDocsLoading(true);
+    setMemberActionNote('');
+    try {
+      const res = await listMemberDocumentsAdmin(token, memberId);
+      setDocsData({ member: res.member, requiredKinds: res.requiredKinds, items: res.items });
+    } catch (e: any) {
+      setDocsData(null);
+      setError(e?.message ?? 'Belgeler yüklenemedi.');
+    } finally {
+      setDocsLoading(false);
+    }
+  }
+
+  function canApproveMember(d: typeof docsData) {
+    if (!d) return false;
+    const byKind = new Map<string, MemberDocument>();
+    for (const it of d.items) byKind.set(it.kind, it);
+    for (const kind of d.requiredKinds) {
+      const doc = byKind.get(kind);
+      if (!doc) return false;
+      if (doc.status !== 'approved') return false;
+    }
+    return true;
+  }
+
+  function canDeleteMemberRow(m: any) {
+    const st = String(m?.verificationStatus || '');
+    // "sil" butonu ancak red / belge tekrarı / onay sonrası aktif
+    return st === 'approved' || st === 'rejected' || st === 'resubmit_required';
+  }
+
   return (
     <>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -417,7 +463,7 @@ function MembersPanel({
       {error ? <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
 
       <div className="mt-6 overflow-hidden rounded-3xl border border-black/5">
-        <div className="grid grid-cols-[1fr_120px] bg-soft-gray px-4 py-3 text-xs font-bold uppercase tracking-wide text-slate-600">
+        <div className="grid grid-cols-[1fr_260px] bg-soft-gray px-4 py-3 text-xs font-bold uppercase tracking-wide text-slate-600">
           <div>Üye</div>
           <div className="text-right">İşlem</div>
         </div>
@@ -425,8 +471,9 @@ function MembersPanel({
         <div className="divide-y divide-black/5">
           {items.map((m) => {
             const isApproved = m.isApproved !== false;
+            const status = String(m.verificationStatus || (isApproved ? 'approved' : 'pending_docs'));
             return (
-              <div key={m.id} className="grid grid-cols-[1fr_120px] items-center px-4 py-4">
+              <div key={m.id} className="grid grid-cols-[1fr_260px] items-center px-4 py-4">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="truncate text-sm font-bold text-slate-900">{m.name}</p>
@@ -437,33 +484,64 @@ function MembersPanel({
                     >
                       {isApproved ? 'Onaylı' : 'Onaysız'}
                     </span>
+                    <span className="rounded-full bg-soft-gray px-2 py-1 text-[11px] font-semibold text-slate-700">
+                      {status}
+                    </span>
                   </div>
                   <p className="mt-1 truncate text-xs text-slate-500">{m.company || '—'}</p>
                   <p className="mt-1 truncate text-xs text-slate-400">{m.email}</p>
                 </div>
 
                 <div className="text-right">
-                  {!isApproved ? (
+                  <div className="flex flex-wrap justify-end gap-2">
                     <button
                       type="button"
-                      className="rounded-full bg-burgundy px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-burgundy-dark disabled:opacity-50"
+                      className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-soft-gray disabled:opacity-50"
                       disabled={loading}
+                      onClick={() => openDocs(m.id)}
+                    >
+                      Belgeler
+                    </button>
+
+                    {!isApproved ? (
+                      <button
+                        type="button"
+                        className="rounded-full bg-burgundy px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-burgundy-dark disabled:opacity-50"
+                        disabled={loading}
+                        onClick={async () => {
+                          if (!token) return;
+                          setError(null);
+                          try {
+                            await approve(token, m.id);
+                            await refresh();
+                          } catch (e: any) {
+                            setError(e?.message ?? 'Onay başarısız.');
+                          }
+                        }}
+                      >
+                        Onayla
+                      </button>
+                    ) : null}
+
+                    <button
+                      type="button"
+                      className="rounded-full border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100 disabled:opacity-50"
+                      disabled={loading || !canDeleteMemberRow(m)}
                       onClick={async () => {
                         if (!token) return;
+                        if (!confirm('Bu üyeyi silmek istediğinize emin misiniz?')) return;
                         setError(null);
                         try {
-                          await approve(token, m.id);
+                          await deleteMember(token, m.id);
                           await refresh();
                         } catch (e: any) {
-                          setError(e?.message ?? 'Onay başarısız.');
+                          setError(e?.message ?? 'Silme başarısız.');
                         }
                       }}
                     >
-                      Onayla
+                      Sil
                     </button>
-                  ) : (
-                    <span className="text-xs font-semibold text-slate-500">—</span>
-                  )}
+                  </div>
                 </div>
               </div>
             );
@@ -472,6 +550,161 @@ function MembersPanel({
           {!loading && items.length === 0 ? <div className="px-4 py-6 text-sm text-slate-600">Kayıt bulunamadı.</div> : null}
         </div>
       </div>
+
+      {docsOpen ? (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
+          <div className="w-full max-w-3xl overflow-hidden rounded-3xl bg-white shadow-card">
+            <div className="flex items-center justify-between border-b border-black/5 px-5 py-4">
+              <div>
+                <div className="text-sm font-bold text-slate-900">Belge İnceleme</div>
+                <div className="mt-0.5 text-xs text-slate-500">
+                  {docsData?.member?.name ? `${docsData.member.name} • ${docsData.member.email}` : '—'}
+                </div>
+              </div>
+              <button
+                type="button"
+                className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700"
+                onClick={() => {
+                  setDocsOpen(false);
+                  setDocsData(null);
+                }}
+              >
+                Kapat
+              </button>
+            </div>
+
+            <div className="max-h-[70vh] overflow-auto p-5">
+              {docsLoading ? (
+                <div className="text-sm text-slate-600">Yükleniyor…</div>
+              ) : !docsData ? (
+                <div className="text-sm text-slate-600">Belge bulunamadı.</div>
+              ) : (
+                <>
+                  <div className="space-y-3">
+                    {(docsData.requiredKinds || []).map((kind) => {
+                      const doc = docsData.items.find((d) => d.kind === kind) || null;
+                      return (
+                        <div key={kind} className="rounded-3xl border border-black/5 bg-soft-gray p-4">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="min-w-0">
+                              <div className="text-sm font-bold text-slate-900">{kind}</div>
+                              <div className="mt-1 text-xs text-slate-600">
+                                Durum: <span className="font-semibold">{doc?.status || 'Eksik'}</span>
+                              </div>
+                              {doc?.reviewerNote ? <div className="mt-1 text-xs text-slate-600">Not: {doc.reviewerNote}</div> : null}
+                            </div>
+                            <div className="flex flex-wrap items-center gap-2">
+                              {doc ? (
+                                <a
+                                  href={documentDownloadUrl(doc.id)}
+                                  className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                                >
+                                  İndir
+                                </a>
+                              ) : null}
+                              {doc ? (
+                                <>
+                                  <button
+                                    type="button"
+                                    className="rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700"
+                                    onClick={async () => {
+                                      if (!token) return;
+                                      await reviewMemberDocumentAdmin(token, docsData.member.id, doc.id, { status: 'approved' });
+                                      await openDocs(docsData.member.id);
+                                    }}
+                                  >
+                                    Onayla
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="rounded-full bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-700"
+                                    onClick={async () => {
+                                      if (!token) return;
+                                      await reviewMemberDocumentAdmin(token, docsData.member.id, doc.id, { status: 'resubmit_required' });
+                                      await openDocs(docsData.member.id);
+                                    }}
+                                  >
+                                    Belge Tekrarı
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="rounded-full bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700"
+                                    onClick={async () => {
+                                      if (!token) return;
+                                      await reviewMemberDocumentAdmin(token, docsData.member.id, doc.id, { status: 'rejected' });
+                                      await openDocs(docsData.member.id);
+                                    }}
+                                  >
+                                    Red
+                                  </button>
+                                </>
+                              ) : null}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="mt-6 rounded-3xl border border-black/5 bg-white p-4">
+                    <label className="text-xs font-bold uppercase tracking-wide text-slate-500">Üye Notu (opsiyonel)</label>
+                    <textarea
+                      value={memberActionNote}
+                      onChange={(e) => setMemberActionNote(e.target.value)}
+                      className="mt-2 w-full rounded-2xl border border-black/10 bg-white px-4 py-2.5 text-sm outline-none focus:border-burgundy"
+                      rows={3}
+                      placeholder="Eksik/yanlış belge açıklaması…"
+                    />
+
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        className="rounded-full bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700"
+                        onClick={async () => {
+                          if (!token) return;
+                          await requestMemberResubmission(token, docsData.member.id, memberActionNote.trim() || undefined);
+                          await refresh();
+                          await openDocs(docsData.member.id);
+                        }}
+                      >
+                        Belge Tekrarı İste
+                      </button>
+                      <button
+                        type="button"
+                        className="rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
+                        onClick={async () => {
+                          if (!token) return;
+                          await rejectMember(token, docsData.member.id, memberActionNote.trim() || undefined);
+                          await refresh();
+                          await openDocs(docsData.member.id);
+                        }}
+                      >
+                        Üyeliği Reddet
+                      </button>
+                      <button
+                        type="button"
+                        className="rounded-full bg-burgundy px-4 py-2 text-sm font-semibold text-white hover:bg-burgundy-dark disabled:opacity-50"
+                        disabled={!canApproveMember(docsData)}
+                        onClick={async () => {
+                          if (!token) return;
+                          await approve(token, docsData.member.id);
+                          await refresh();
+                          await openDocs(docsData.member.id);
+                        }}
+                      >
+                        Üyeyi Onayla
+                      </button>
+                    </div>
+                    {!canApproveMember(docsData) ? (
+                      <div className="mt-2 text-xs text-slate-500">Not: Üye onayı için tüm zorunlu belgeler “approved” olmalı.</div>
+                    ) : null}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }

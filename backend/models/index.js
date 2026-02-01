@@ -54,9 +54,13 @@ db.Publication = require('./Publication')(sequelize, Sequelize);
 db.PageContent = require('./PageContent')(sequelize, Sequelize);
 db.Event = require('./Event')(sequelize, Sequelize);
 db.Partner = require('./Partner')(sequelize, Sequelize);
+db.MemberDocument = require('./MemberDocument')(sequelize, Sequelize);
+db.SmsFeedback = require('./SmsFeedback')(sequelize, Sequelize);
 
 // Associations
 db.User.hasOne(db.Member, { foreignKey: 'userId' });
 db.Member.belongsTo(db.User, { foreignKey: 'userId' });
+db.Member.hasMany(db.MemberDocument, { foreignKey: 'memberId', as: 'documents' });
+db.MemberDocument.belongsTo(db.Member, { foreignKey: 'memberId' });
 
 module.exports = db;

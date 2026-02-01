@@ -25,11 +25,23 @@ router.post(
     body('name').trim().notEmpty(),
     body('company').optional().trim(),
     body('role').optional().trim(),
+    body('phoneCountryCode').trim().notEmpty().matches(/^\+\d{1,4}$/).withMessage('Geçersiz ülke kodu.'),
+    body('phoneNumber').trim().notEmpty().matches(/^\d{4,15}$/).withMessage('Geçersiz telefon numarası.'),
+    body('kvkkAccepted')
+      .isBoolean()
+      .toBoolean()
+      .custom((v) => v === true)
+      .withMessage('KVKK onayı zorunludur.'),
+    body('termsAccepted')
+      .isBoolean()
+      .toBoolean()
+      .custom((v) => v === true)
+      .withMessage('Kullanım ve üyelik şartları onayı zorunludur.'),
   ],
   validate,
   async (req, res) => {
     try {
-      const { email, password, name, company, role } = req.body;
+      const { email, password, name, company, role, phoneCountryCode, phoneNumber } = req.body;
       const existing = await db.User.findOne({ where: { email } });
       if (existing) {
         return res.status(400).json({ error: 'Email already registered.' });
@@ -41,6 +53,7 @@ router.post(
         role: 'member',
       });
       const joinDate = new Date().toISOString().split('T')[0];
+      const e164 = `${String(phoneCountryCode).trim()}${String(phoneNumber).trim()}`;
       const member = await db.Member.create({
         userId: user.id,
         name,
@@ -49,6 +62,12 @@ router.post(
         role: role || null,
         joinDate,
         isApproved: false,
+        verificationStatus: 'pending_docs',
+        phoneCountryCode: String(phoneCountryCode).trim(),
+        phoneNumber: String(phoneNumber).trim(),
+        phoneE164: e164,
+        kvkkAcceptedAt: new Date(),
+        termsAcceptedAt: new Date(),
       });
       const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
       res.status(201).json({

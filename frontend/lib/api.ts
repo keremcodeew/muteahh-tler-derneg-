@@ -142,6 +142,18 @@ export type Partner = {
   updatedAt?: string;
 };
 
+export type MemberDocument = {
+  id: number;
+  kind: string;
+  filename: string | null;
+  mimeType: string | null;
+  sizeBytes: number;
+  status: 'uploaded' | 'approved' | 'rejected' | 'resubmit_required';
+  reviewerNote: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 function isBrowser() {
   return typeof window !== 'undefined';
 }
@@ -194,10 +206,23 @@ export async function register(payload: {
   name: string;
   company?: string;
   role?: string;
+  phoneCountryCode: string;
+  phoneNumber: string;
+  kvkkAccepted: boolean;
+  termsAccepted: boolean;
 }) {
   return await apiFetch<{ token: string; user: AuthUser; member: any }>('/api/auth/register', {
     method: 'POST',
     body: JSON.stringify(payload),
+  });
+}
+
+// --- SMS Feedback (public) ---
+
+export async function createSmsFeedback(payload: { phoneE164: string; message: string; name?: string; email?: string }) {
+  return await apiFetch<{ success: true; id: number }>('/api/sms-feedback', {
+    method: 'POST',
+    body: JSON.stringify({ ...payload, source: 'web' }),
   });
 }
 
@@ -244,6 +269,79 @@ export async function updateMyMember(
     method: 'PATCH',
     headers: { Authorization: `Bearer ${token}` },
     body: JSON.stringify(updates),
+  });
+}
+
+// --- Member Documents ---
+
+export async function listMyDocuments(token: string) {
+  return await apiFetch<{
+    requiredKinds: string[];
+    verificationStatus: string;
+    verificationNote: string | null;
+    items: MemberDocument[];
+  }>('/api/members/me/documents', {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function uploadMyDocument(token: string, payload: { kind: string; filename: string; mimeType: string; base64: string }) {
+  return await apiFetch<{ id: number; kind: string; status: string }>('/api/members/me/documents', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify(payload),
+  });
+}
+
+export function documentDownloadUrl(docId: number) {
+  return `/api/members/documents/${docId}/download`;
+}
+
+export async function listMemberDocumentsAdmin(token: string, memberId: number) {
+  return await apiFetch<{
+    member: { id: number; name: string; email: string; isApproved: boolean; verificationStatus: string; verificationNote: string | null };
+    requiredKinds: string[];
+    items: MemberDocument[];
+  }>(`/api/members/${memberId}/documents`, {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function reviewMemberDocumentAdmin(
+  token: string,
+  memberId: number,
+  docId: number,
+  payload: { status: 'approved' | 'rejected' | 'resubmit_required'; reviewerNote?: string }
+) {
+  return await apiFetch<{ success: true }>(`/api/members/${memberId}/documents/${docId}/review`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function requestMemberResubmission(token: string, memberId: number, verificationNote?: string) {
+  return await apiFetch(`/api/members/${memberId}/request-resubmission`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ verificationNote }),
+  });
+}
+
+export async function rejectMember(token: string, memberId: number, verificationNote?: string) {
+  return await apiFetch(`/api/members/${memberId}/reject`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ verificationNote }),
+  });
+}
+
+export async function deleteMember(token: string, memberId: number) {
+  return await apiFetch(`/api/members/${memberId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
   });
 }
 

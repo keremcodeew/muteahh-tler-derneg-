@@ -13,6 +13,7 @@ const publicationsRoutes = require('./routes/publications');
 const pagesRoutes = require('./routes/pages');
 const eventsRoutes = require('./routes/events');
 const partnersRoutes = require('./routes/partners');
+const smsFeedbackRoutes = require('./routes/sms-feedback');
 
 const app = express();
 
@@ -20,7 +21,8 @@ app.use(cors({
   origin: process.env.FRONTEND_URL || true,
   credentials: true,
 }));
-app.use(express.json());
+// NOTE: We allow larger JSON bodies to support base64 document uploads.
+app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 if (process.env.UPLOAD_DIR) {
@@ -37,6 +39,7 @@ app.use('/api/publications', publicationsRoutes);
 app.use('/api/pages', pagesRoutes);
 app.use('/api/events', eventsRoutes);
 app.use('/api/partners', partnersRoutes);
+app.use('/api/sms-feedback', smsFeedbackRoutes);
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 

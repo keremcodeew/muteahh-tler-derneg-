@@ -7,6 +7,20 @@ export function SiteFooter() {
         <div>
           <p className="text-sm font-semibold text-white/90">Antalya Müteahhitler Derneği</p>
           <p className="mt-1 text-xs text-white/70">Kurumsal ve sade tasarım • Next.js 14 • Tailwind • TypeScript</p>
+          <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-white/70">
+            <Link href="/kvkk" className="hover:text-white">
+              KVKK
+            </Link>
+            <Link href="/kullanim-sartlari" className="hover:text-white">
+              Kullanım Şartları
+            </Link>
+            <Link href="/uyelik-sartlari" className="hover:text-white">
+              Üyelik Şartları
+            </Link>
+            <Link href="/sms-geri-bildirim" className="hover:text-white">
+              SMS ile Geri Bildirim
+            </Link>
+          </div>
         </div>
 
         <div className="flex flex-wrap gap-3">
