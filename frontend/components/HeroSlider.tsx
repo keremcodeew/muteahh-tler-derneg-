@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import type { SliderItem } from '../lib/dummyData';
+import { normalizeImageSrc } from '../lib/normalizeImageSrc';
 
 type Props = {
   items: SliderItem[];
@@ -29,7 +30,7 @@ export function HeroSlider({ items }: Props) {
     <section className="relative w-full overflow-hidden rounded-3xl bg-slate-900">
       <div className="relative h-[360px] md:h-[460px] lg:h-[520px]">
         <Image
-          src={current.imageUrl}
+          src={normalizeImageSrc(current.imageUrl)}
           alt={current.title}
           fill
           priority

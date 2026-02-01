@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { NewsItem } from '../lib/dummyData';
+import { normalizeImageSrc } from '../lib/normalizeImageSrc';
 
 type Props = {
   item: NewsItem;
@@ -13,7 +14,12 @@ export function NewsCard({ item }: Props) {
       className="group overflow-hidden rounded-3xl bg-white shadow-card transition-all hover:-translate-y-1 hover:shadow-card-hover"
     >
       <div className="relative aspect-[21/9] overflow-hidden">
-        <Image src={item.imageUrl} alt={item.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
+        <Image
+          src={normalizeImageSrc(item.imageUrl)}
+          alt={item.title}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+        />
       </div>
       <div className="p-3">
         <h3 className="text-xs font-bold text-slate-900 transition-colors group-hover:text-burgundy line-clamp-2 sm:text-sm">

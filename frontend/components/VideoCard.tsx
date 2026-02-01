@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { VideoItem } from '../lib/dummyData';
+import { normalizeImageSrc } from '../lib/normalizeImageSrc';
 
 type Props = {
   item: VideoItem;
@@ -14,7 +15,7 @@ export function VideoCard({ item }: Props) {
     >
       <div className="relative aspect-[21/9] overflow-hidden">
         <Image
-          src={item.thumbnailUrl}
+          src={normalizeImageSrc(item.thumbnailUrl)}
           alt={item.title}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"

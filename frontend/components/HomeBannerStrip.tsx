@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { HomeBanner } from '../lib/api';
+import { normalizeImageSrc } from '../lib/normalizeImageSrc';
 
 function isInternalHref(href: string) {
   return href.startsWith('/');
@@ -123,7 +124,7 @@ export function HomeBannerStrip({ banners, loading }: { banners: HomeBanner[]; l
           className={`absolute inset-0 ${activeLayer === 'a' ? 'z-20 opacity-100' : 'z-10 opacity-0'}`}
         >
           <Image
-            src={layerAEffective.imageUrl}
+            src={normalizeImageSrc(layerAEffective.imageUrl)}
             alt={layerAEffective.title}
             fill
             sizes="(min-width: 1024px) 1152px, 100vw"
@@ -136,7 +137,7 @@ export function HomeBannerStrip({ banners, loading }: { banners: HomeBanner[]; l
           className={`absolute inset-0 ${activeLayer === 'b' ? 'z-20 opacity-100' : 'z-10 opacity-0'}`}
         >
           <Image
-            src={layerBEffective.imageUrl}
+            src={normalizeImageSrc(layerBEffective.imageUrl)}
             alt={layerBEffective.title}
             fill
             sizes="(min-width: 1024px) 1152px, 100vw"

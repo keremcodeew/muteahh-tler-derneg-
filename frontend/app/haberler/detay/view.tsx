@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { PageHero } from '../../../components/PageHero';
 import { PageLayoutWithFooter } from '../../../components/PageLayout';
+import { normalizeImageSrc } from '../../../lib/normalizeImageSrc';
 
 type NewsDetail = {
   id: number;
@@ -90,7 +91,7 @@ export function NewsDetailView() {
           <article className="mt-6 overflow-hidden rounded-3xl bg-white shadow-card">
             {item.imageUrl ? (
               <div className="relative aspect-[21/9] w-full">
-                <Image src={item.imageUrl} alt={item.title} fill className="object-cover" />
+                <Image src={normalizeImageSrc(item.imageUrl)} alt={item.title} fill className="object-cover" />
               </div>
             ) : null}
             <div className="p-6">
