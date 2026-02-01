@@ -1,12 +1,16 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { PageHero } from '../../components/PageHero';
 import { PageLayoutWithFooter } from '../../components/PageLayout';
 import { listMembersPublic } from '../../lib/api';
 
-export default function MembersPage() {
-  const [search, setSearch] = useState('');
+function MembersPageInner() {
+  const sp = useSearchParams();
+  const urlSearch = useMemo(() => (sp.get('search') || '').trim(), [sp]);
+
+  const [search, setSearch] = useState(urlSearch);
   const [page, setPage] = useState(1);
   const [items, setItems] = useState<any[]>([]);
   const [totalPages, setTotalPages] = useState(1);
@@ -14,6 +18,11 @@ export default function MembersPage() {
   const [error, setError] = useState<string | null>(null);
 
   const effectiveSearch = useMemo(() => search.trim(), [search]);
+
+  useEffect(() => {
+    setSearch(urlSearch);
+    setPage(1);
+  }, [urlSearch]);
 
   useEffect(() => {
     let cancelled = false;
@@ -116,6 +125,14 @@ export default function MembersPage() {
         </div>
       </section>
     </PageLayoutWithFooter>
+  );
+}
+
+export default function MembersPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen w-full bg-white" />}>
+      <MembersPageInner />
+    </Suspense>
   );
 }
 
