@@ -96,6 +96,18 @@ router.post(
       if (!user) {
         return res.status(401).json({ error: 'Invalid email or password.' });
       }
+      // Defensive: ensure we have a password hash stored.
+      if (!user.password || typeof user.password !== 'string') {
+        // Auto-repair for platform admin if env vars exist (helps after historical bad data)
+        const adminEmail = process.env.ADMIN_EMAIL;
+        const adminPass = process.env.ADMIN_PASSWORD;
+        if (adminEmail && adminPass && String(adminEmail).toLowerCase() === String(email).toLowerCase()) {
+          const repairedHash = await bcrypt.hash(String(adminPass), 10);
+          await user.update({ password: repairedHash });
+        } else {
+          return res.status(500).json({ error: 'User password is not set. Please reset password or contact support.' });
+        }
+      }
       const valid = await bcrypt.compare(password, user.password);
       if (!valid) {
         return res.status(401).json({ error: 'Invalid email or password.' });

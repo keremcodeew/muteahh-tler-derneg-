@@ -20,6 +20,12 @@ async function seed() {
       } else {
         console.log('Admin user already exists.');
       }
+      // Repair missing password hash (historical data)
+      if (!existing.password) {
+        const hashed = await bcrypt.hash(ADMIN_PASSWORD, 10);
+        await existing.update({ password: hashed });
+        console.log('Admin password hash repaired.');
+      }
       process.exit(0);
       return;
     }
