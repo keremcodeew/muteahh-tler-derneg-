@@ -12,15 +12,6 @@ function isInternalHref(href: string) {
 export function HomeBannerStrip({ banners, loading }: { banners: HomeBanner[]; loading?: boolean }) {
   const list = useMemo(() => (Array.isArray(banners) ? banners : []), [banners]);
 
-  if (!list.length && loading) {
-    return (
-      <div className="relative w-full overflow-hidden rounded-3xl bg-soft-gray shadow-card">
-        <div className="h-[140px] animate-pulse sm:h-[165px] md:h-[190px]" />
-      </div>
-    );
-  }
-  if (!list.length) return null;
-
   const rootRef = useRef<HTMLDivElement | null>(null);
   const layerARef = useRef<HTMLDivElement | null>(null);
   const layerBRef = useRef<HTMLDivElement | null>(null);
@@ -28,11 +19,10 @@ export function HomeBannerStrip({ banners, loading }: { banners: HomeBanner[]; l
   const currentIndexRef = useRef(0);
 
   const [activeLayer, setActiveLayer] = useState<'a' | 'b'>('a');
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [layerA, setLayerA] = useState<HomeBanner>(() => list[0]);
-  const [layerB, setLayerB] = useState<HomeBanner>(() => list[0]);
+  const [layerA, setLayerA] = useState<HomeBanner | null>(() => list[0] ?? null);
+  const [layerB, setLayerB] = useState<HomeBanner | null>(() => list[0] ?? null);
 
-  const activeBanner = activeLayer === 'a' ? layerA : layerB;
+  const activeBanner = (activeLayer === 'a' ? layerA : layerB) ?? list[0] ?? null;
 
   // Reset when list changes (e.g., admin updates banners)
   useEffect(() => {
@@ -40,7 +30,6 @@ export function HomeBannerStrip({ banners, loading }: { banners: HomeBanner[]; l
     activeLayerRef.current = 'a';
     currentIndexRef.current = 0;
     setActiveLayer('a');
-    setCurrentIndex(0);
     setLayerA(list[0]);
     setLayerB(list[0]);
     // Reset layer visibility
@@ -75,7 +64,6 @@ export function HomeBannerStrip({ banners, loading }: { banners: HomeBanner[]; l
       // Update title/href immediately to match the incoming banner
       setActiveLayer(toLayer);
       activeLayerRef.current = toLayer;
-      setCurrentIndex(nextIndex);
       currentIndexRef.current = nextIndex;
 
       // Animate transition
@@ -113,6 +101,19 @@ export function HomeBannerStrip({ banners, loading }: { banners: HomeBanner[]; l
     };
   }, [list]);
 
+  if (!list.length && loading) {
+    return (
+      <div className="relative w-full overflow-hidden rounded-3xl bg-soft-gray shadow-card">
+        <div className="h-[140px] animate-pulse sm:h-[165px] md:h-[190px]" />
+      </div>
+    );
+  }
+  if (!list.length) return null;
+  if (!activeBanner) return null;
+
+  const layerAEffective = layerA ?? activeBanner;
+  const layerBEffective = layerB ?? activeBanner;
+
   const content = (
     <div ref={rootRef} className="group relative w-full overflow-hidden rounded-3xl bg-slate-900 shadow-card">
       <div className="relative h-[140px] sm:h-[165px] md:h-[190px]">
@@ -122,8 +123,8 @@ export function HomeBannerStrip({ banners, loading }: { banners: HomeBanner[]; l
           className={`absolute inset-0 ${activeLayer === 'a' ? 'z-20 opacity-100' : 'z-10 opacity-0'}`}
         >
           <Image
-            src={layerA.imageUrl}
-            alt={layerA.title}
+            src={layerAEffective.imageUrl}
+            alt={layerAEffective.title}
             fill
             sizes="(min-width: 1024px) 1152px, 100vw"
             className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
@@ -135,8 +136,8 @@ export function HomeBannerStrip({ banners, loading }: { banners: HomeBanner[]; l
           className={`absolute inset-0 ${activeLayer === 'b' ? 'z-20 opacity-100' : 'z-10 opacity-0'}`}
         >
           <Image
-            src={layerB.imageUrl}
-            alt={layerB.title}
+            src={layerBEffective.imageUrl}
+            alt={layerBEffective.title}
             fill
             sizes="(min-width: 1024px) 1152px, 100vw"
             className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
