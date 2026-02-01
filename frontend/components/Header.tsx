@@ -3,26 +3,12 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { getToken } from '../lib/api';
-import { useLang } from '../lib/lang';
 
 type NavItem = { href: string; label: string };
 
 export function Header() {
-  const { lang, setLang } = useLang();
-
-  const navItems: NavItem[] = useMemo(() => {
-    if (lang === 'EN') {
-      return [
-        { href: '/', label: 'Home' },
-        { href: '/kurumsal', label: 'Corporate' },
-        { href: '/uyelerimiz', label: 'Members' },
-        { href: '/duyurular', label: 'Announcements' },
-        { href: '/haberler', label: 'News' },
-        { href: '/yayinlar', label: 'Publications' },
-        { href: '/iletisim', label: 'Contact' },
-      ];
-    }
-    return [
+  const navItems: NavItem[] = useMemo(
+    () => [
       { href: '/', label: 'Ana Sayfa' },
       { href: '/kurumsal', label: 'Kurumsal' },
       { href: '/uyelerimiz', label: 'Üyelerimiz' },
@@ -30,8 +16,9 @@ export function Header() {
       { href: '/haberler', label: 'Haberler' },
       { href: '/yayinlar', label: 'Yayınlar' },
       { href: '/iletisim', label: 'İletişim' },
-    ];
-  }, [lang]);
+    ],
+    []
+  );
 
   const [open, setOpen] = useState(false);
   const [hasToken, setHasToken] = useState(false);
@@ -81,35 +68,12 @@ export function Header() {
             </IconButton>
           </div>
 
-          {/* Language toggle */}
-          <div className="hidden items-center gap-1 rounded-full bg-soft-gray p-1 text-xs font-semibold xl:flex">
-            <button
-              type="button"
-              onClick={() => setLang('TR')}
-              className={`rounded-full px-2 py-1 transition-colors ${
-                lang === 'TR' ? 'bg-white text-burgundy shadow-sm' : 'text-slate-500 hover:text-slate-700'
-              }`}
-            >
-              TR
-            </button>
-            <span className="text-slate-400">|</span>
-            <button
-              type="button"
-              onClick={() => setLang('EN')}
-              className={`rounded-full px-2 py-1 transition-colors ${
-                lang === 'EN' ? 'bg-white text-burgundy shadow-sm' : 'text-slate-500 hover:text-slate-700'
-              }`}
-            >
-              EN
-            </button>
-          </div>
-
           {/* CTA */}
           <Link
             href={hasToken ? '/profilim' : '/login'}
             className="rounded-full bg-burgundy px-4 py-2 text-sm font-semibold text-white shadow-card transition-all hover:-translate-y-0.5 hover:bg-burgundy-dark hover:shadow-card-hover"
           >
-            {hasToken ? (lang === 'EN' ? 'My Profile' : 'Profilim') : lang === 'EN' ? 'MEMBER LOGIN' : 'ÜYE GİRİŞİ'}
+            {hasToken ? 'Profilim' : 'ÜYE GİRİŞİ'}
           </Link>
 
           {/* Mobile menu button */}

@@ -9,13 +9,11 @@ import {
   createAnnouncement,
   createBanner,
   createNews,
-  createAiBlogTask,
   createPublication,
   createSlide,
   createVideo,
   deleteAnnouncement,
   deleteBanner,
-  deleteAiBlogTask,
   deleteMember,
   deleteNews,
   deletePublication,
@@ -28,8 +26,6 @@ import {
   createPartner,
   listAnnouncementsAdminAll,
   listBannersAdminAll,
-  listAiBlogTasksAdminAll,
-  listBlogAdminAll,
   listEventsAdminAll,
   listMembersAdminAll,
   listNewsAdminAll,
@@ -44,7 +40,6 @@ import {
   rejectMember,
   requestMemberResubmission,
   reviewMemberDocumentAdmin,
-  runAiBlogNow,
   updateBanner,
   updateEvent,
   updatePartner,
@@ -55,8 +50,6 @@ import {
   updateSlide,
   updateVideo,
   type Announcement,
-  type AiBlogTask,
-  type BlogPost,
   type Event,
   type HeroSlide,
   type HomeBanner,
@@ -74,7 +67,7 @@ export default function PlatformAdminPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [tab, setTab] = useState<
-    'members' | 'slides' | 'banners' | 'news' | 'announcements' | 'videos' | 'publications' | 'events' | 'partners' | 'kurumsal' | 'ai_blog'
+    'members' | 'slides' | 'banners' | 'news' | 'announcements' | 'videos' | 'publications' | 'events' | 'partners' | 'kurumsal'
   >('members');
 
   const [items, setItems] = useState<any[]>([]);
@@ -157,7 +150,6 @@ export default function PlatformAdminPage() {
             <TabButton active={tab === 'events'} onClick={() => setTab('events')}>Etkinlikler</TabButton>
             <TabButton active={tab === 'partners'} onClick={() => setTab('partners')}>Partnerler</TabButton>
             <TabButton active={tab === 'kurumsal'} onClick={() => setTab('kurumsal')}>Kurumsal</TabButton>
-            <TabButton active={tab === 'ai_blog'} onClick={() => setTab('ai_blog')}>AI Blog</TabButton>
           </div>
 
           <div className="mt-6">
@@ -188,7 +180,7 @@ export default function PlatformAdminPage() {
             ) : tab === 'partners' ? (
               <PartnersPanel token={token} />
             ) : (
-              tab === 'ai_blog' ? <AiBlogPanel token={token} /> : <KurumsalPanel token={token} />
+              <KurumsalPanel token={token} />
             )}
           </div>
         </section>
@@ -792,239 +784,6 @@ function MembersPanel({
         </div>
       ) : null}
     </>
-  );
-}
-
-function AiBlogPanel({ token }: { token: string | null }) {
-  const [tasks, setTasks] = useState<AiBlogTask[]>([]);
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const [title, setTitle] = useState('');
-  const [publishAt, setPublishAt] = useState('');
-  const [tone, setTone] = useState('Kurumsal, bilgilendirici');
-  const [maxWords, setMaxWords] = useState(900);
-  const [keywords, setKeywords] = useState('');
-
-  const fmtLocal = useMemo(() => {
-    return (iso: string | null | undefined) => {
-      if (!iso) return '—';
-      const d = new Date(iso);
-      if (isNaN(d.getTime())) return String(iso);
-      return d.toLocaleString('tr-TR');
-    };
-  }, []);
-
-  async function refresh() {
-    if (!token) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const [t, p] = await Promise.all([
-        listAiBlogTasksAdminAll(token, { page: 1, limit: 200 }),
-        listBlogAdminAll(token, { page: 1, limit: 50 }),
-      ]);
-      setTasks(t.items || []);
-      setPosts(p.items || []);
-    } catch (e: any) {
-      setError(e?.message ?? 'AI Blog verileri yüklenemedi.');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
-
-  return (
-    <div>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-lg font-bold text-slate-900">AI Blog</h2>
-          <p className="mt-1 text-sm text-slate-600">
-            Başlık + tarih/saat ayarlayın. Zamanı gelince sistem otomatik blog yazısı üretip yayınlar.
-          </p>
-          <p className="mt-1 text-xs text-slate-500">
-            Not: AI üretimi için backend’de <span className="font-semibold">GOOGLE_AI_STUDIO_API_KEY</span> (veya{' '}
-            <span className="font-semibold">GEMINI_API_KEY</span>) tanımlı olmalı.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={refresh}
-            disabled={loading}
-            className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-slate-700 disabled:opacity-50"
-          >
-            {loading ? 'Yükleniyor…' : 'Yenile'}
-          </button>
-          <button
-            type="button"
-            disabled={loading || !token}
-            className="rounded-full bg-burgundy px-4 py-2 text-sm font-semibold text-white hover:bg-burgundy-dark disabled:opacity-50"
-            onClick={async () => {
-              if (!token) return;
-              setError(null);
-              setLoading(true);
-              try {
-                await runAiBlogNow(token, 5);
-                await refresh();
-              } catch (e: any) {
-                setError(e?.message ?? 'Çalıştırma başarısız.');
-              } finally {
-                setLoading(false);
-              }
-            }}
-          >
-            Şimdi Çalıştır (Due)
-          </button>
-        </div>
-      </div>
-
-      {error ? <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
-
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_420px]">
-        <div className="rounded-3xl border border-black/5 bg-soft-gray p-5">
-          <h3 className="text-sm font-bold text-slate-900">Zamanlanmış Başlık Ekle</h3>
-          <div className="mt-4 grid grid-cols-1 gap-4">
-            <Field label="Başlık">
-              <TextInput value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Örn. 2026 İnşaat Sektöründe Trendler" />
-            </Field>
-            <Field label="Tarih / Saat">
-              <TextInput type="datetime-local" value={publishAt} onChange={(e) => setPublishAt(e.target.value)} />
-            </Field>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Field label="Maks. Kelime">
-                <TextInput
-                  type="number"
-                  min={200}
-                  max={2000}
-                  value={String(maxWords)}
-                  onChange={(e) => setMaxWords(Number(e.target.value || 900))}
-                />
-              </Field>
-              <Field label="Ton">
-                <TextInput value={tone} onChange={(e) => setTone(e.target.value)} placeholder="Kurumsal, bilgilendirici" />
-              </Field>
-            </div>
-            <Field label="Anahtar Kelimeler (virgülle)">
-              <TextInput value={keywords} onChange={(e) => setKeywords(e.target.value)} placeholder="inşaat, müteahhitlik, sürdürülebilirlik" />
-            </Field>
-
-            <button
-              type="button"
-              disabled={loading || !token}
-              className="w-full rounded-full bg-emerald-600 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
-              onClick={async () => {
-                if (!token) return;
-                setError(null);
-                if (!title.trim()) {
-                  setError('Başlık zorunlu.');
-                  return;
-                }
-                if (!publishAt) {
-                  setError('Tarih/saat zorunlu.');
-                  return;
-                }
-                setLoading(true);
-                try {
-                  const kws = keywords
-                    .split(',')
-                    .map((s) => s.trim())
-                    .filter(Boolean);
-                  await createAiBlogTask(token, {
-                    title: title.trim(),
-                    publishAt: new Date(publishAt).toISOString(),
-                    settings: { language: 'tr', tone: tone.trim() || 'kurumsal', maxWords, keywords: kws },
-                  });
-                  setTitle('');
-                  setPublishAt('');
-                  setKeywords('');
-                  await refresh();
-                } catch (e: any) {
-                  setError(e?.message ?? 'Kayıt başarısız.');
-                } finally {
-                  setLoading(false);
-                }
-              }}
-            >
-              Zamanla
-            </button>
-          </div>
-        </div>
-
-        <div className="rounded-3xl bg-white p-5 shadow-card">
-          <h3 className="text-sm font-bold text-slate-900">Son Blog Yazıları</h3>
-          <div className="mt-4 space-y-3">
-            {(posts || []).slice(0, 8).map((p) => (
-              <div key={p.id} className="rounded-3xl border border-black/5 bg-soft-gray p-4">
-                <div className="text-xs text-slate-500">{p.publishDate}</div>
-                <div className="mt-1 text-sm font-bold text-slate-900">{p.title}</div>
-                <div className="mt-1 text-xs text-slate-600 line-clamp-2">{p.excerpt || ''}</div>
-                <div className="mt-2 text-xs text-slate-500">
-                  Slug: <span className="font-mono">{p.slug}</span>
-                </div>
-              </div>
-            ))}
-            {!loading && (!posts || posts.length === 0) ? <div className="text-sm text-slate-600">Henüz blog yok.</div> : null}
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-6 overflow-hidden rounded-3xl border border-black/5">
-        <div className="grid grid-cols-[1fr_220px] bg-soft-gray px-4 py-3 text-xs font-bold uppercase tracking-wide text-slate-600">
-          <div>Zamanlanmış İşler</div>
-          <div className="text-right">İşlem</div>
-        </div>
-        <div className="divide-y divide-black/5 bg-white">
-          {(tasks || []).map((t) => (
-            <div key={t.id} className="grid grid-cols-[1fr_220px] items-center gap-4 px-4 py-4">
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <div className="truncate text-sm font-bold text-slate-900">{t.title}</div>
-                  <span className="rounded-full bg-soft-gray px-2 py-1 text-[11px] font-semibold text-slate-700">{t.status}</span>
-                  {t.generatedPostId ? (
-                    <span className="rounded-full bg-emerald-100 px-2 py-1 text-[11px] font-semibold text-emerald-800">
-                      post #{t.generatedPostId}
-                    </span>
-                  ) : null}
-                </div>
-                <div className="mt-1 text-xs text-slate-500">Planlanan: {fmtLocal(t.publishAt)}</div>
-                {t.lastError ? <div className="mt-1 text-xs text-red-600">Hata: {t.lastError}</div> : null}
-              </div>
-              <div className="text-right">
-                <button
-                  type="button"
-                  className="rounded-full border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100 disabled:opacity-50"
-                  disabled={loading || !token}
-                  onClick={async () => {
-                    if (!token) return;
-                    if (!confirm('Bu zamanlanmış işi silmek istediğinize emin misiniz?')) return;
-                    setLoading(true);
-                    setError(null);
-                    try {
-                      await deleteAiBlogTask(token, t.id);
-                      await refresh();
-                    } catch (e: any) {
-                      setError(e?.message ?? 'Silme başarısız.');
-                    } finally {
-                      setLoading(false);
-                    }
-                  }}
-                >
-                  Sil
-                </button>
-              </div>
-            </div>
-          ))}
-          {!loading && (!tasks || tasks.length === 0) ? <div className="px-4 py-6 text-sm text-slate-600">Kayıt yok.</div> : null}
-        </div>
-      </div>
-    </div>
   );
 }
 

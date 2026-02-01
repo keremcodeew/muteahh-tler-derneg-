@@ -518,10 +518,6 @@ export async function listNewsSlider() {
   return await apiFetch<News[]>('/api/news/slider', { method: 'GET' });
 }
 
-export async function getNewsById(id: number | string) {
-  return await apiFetch<News>(`/api/news/${encodeURIComponent(String(id))}`, { method: 'GET' });
-}
-
 export async function listAnnouncementsPublic(params?: { page?: number; limit?: number }) {
   const qs = new URLSearchParams();
   if (params?.page) qs.set('page', String(params.page));
