@@ -2,76 +2,167 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { HomeBanner } from '../lib/api';
 
 function isInternalHref(href: string) {
   return href.startsWith('/');
 }
 
-export function HomeBannerStrip({ banner, loading }: { banner: HomeBanner | null; loading?: boolean }) {
-  if (!banner && loading) {
+export function HomeBannerStrip({ banners, loading }: { banners: HomeBanner[]; loading?: boolean }) {
+  const list = useMemo(() => (Array.isArray(banners) ? banners : []), [banners]);
+
+  if (!list.length && loading) {
     return (
       <div className="relative w-full overflow-hidden rounded-3xl bg-soft-gray shadow-card">
         <div className="h-[140px] animate-pulse sm:h-[165px] md:h-[190px]" />
       </div>
     );
   }
-  if (!banner) return null;
+  if (!list.length) return null;
 
   const rootRef = useRef<HTMLDivElement | null>(null);
+  const layerARef = useRef<HTMLDivElement | null>(null);
+  const layerBRef = useRef<HTMLDivElement | null>(null);
+  const activeLayerRef = useRef<'a' | 'b'>('a');
+  const currentIndexRef = useRef(0);
 
+  const [activeLayer, setActiveLayer] = useState<'a' | 'b'>('a');
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [layerA, setLayerA] = useState<HomeBanner>(() => list[0]);
+  const [layerB, setLayerB] = useState<HomeBanner>(() => list[0]);
+
+  const activeBanner = activeLayer === 'a' ? layerA : layerB;
+
+  // Reset when list changes (e.g., admin updates banners)
   useEffect(() => {
-    let killed = false;
+    if (!list.length) return;
+    activeLayerRef.current = 'a';
+    currentIndexRef.current = 0;
+    setActiveLayer('a');
+    setCurrentIndex(0);
+    setLayerA(list[0]);
+    setLayerB(list[0]);
+    // Reset layer visibility
     (async () => {
       try {
         const mod: any = await import('gsap');
         const gsap = mod?.gsap || mod?.default || mod;
-        if (!gsap || !rootRef.current || killed) return;
-        gsap.fromTo(
-          rootRef.current,
-          { opacity: 0, y: 10, scale: 0.99 },
-          { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: 'power2.out' }
-        );
+        if (!gsap) return;
+        if (layerARef.current) gsap.set(layerARef.current, { opacity: 1, zIndex: 2, clipPath: 'inset(0 0% 0 0)', scale: 1 });
+        if (layerBRef.current) gsap.set(layerBRef.current, { opacity: 0, zIndex: 1, clipPath: 'inset(0 0% 0 0)', scale: 1 });
       } catch {
-        // If gsap isn't available, silently skip animation.
+        // ignore
       }
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [list.length]);
+
+  useEffect(() => {
+    const len = list.length;
+    if (len <= 1) return;
+    let killed = false;
+    const t = setInterval(() => {
+      const fromLayer = activeLayerRef.current;
+      const toLayer = fromLayer === 'a' ? 'b' : 'a';
+      const nextIndex = (currentIndexRef.current + 1) % len;
+      const nextBanner = list[nextIndex];
+
+      // Put next banner into the hidden layer
+      if (toLayer === 'a') setLayerA(nextBanner);
+      else setLayerB(nextBanner);
+
+      // Update title/href immediately to match the incoming banner
+      setActiveLayer(toLayer);
+      activeLayerRef.current = toLayer;
+      setCurrentIndex(nextIndex);
+      currentIndexRef.current = nextIndex;
+
+      // Animate transition
+      (async () => {
+        try {
+          const mod: any = await import('gsap');
+          const gsap = mod?.gsap || mod?.default || mod;
+          if (!gsap || killed) return;
+
+          const activeEl = fromLayer === 'a' ? layerARef.current : layerBRef.current;
+          const nextEl = toLayer === 'a' ? layerARef.current : layerBRef.current;
+          if (!activeEl || !nextEl) return;
+
+          // Marvel-like wipe (left->right) with scale punch
+          gsap.set(nextEl, { opacity: 1, zIndex: 3, clipPath: 'inset(0 100% 0 0)', scale: 1.06 });
+          gsap.set(activeEl, { opacity: 1, zIndex: 2, clipPath: 'inset(0 0% 0 0)', scale: 1 });
+
+          const tl = gsap.timeline({
+            onComplete: () => {
+              gsap.set(activeEl, { opacity: 0, zIndex: 1, clipPath: 'inset(0 0% 0 0)', scale: 1 });
+              gsap.set(nextEl, { opacity: 1, zIndex: 2, clipPath: 'inset(0 0% 0 0)', scale: 1 });
+            },
+          });
+          tl.to(activeEl, { scale: 1.03, duration: 0.6, ease: 'power2.out' }, 0);
+          tl.to(nextEl, { clipPath: 'inset(0 0% 0 0)', scale: 1, duration: 0.85, ease: 'power3.inOut' }, 0);
+          tl.to(activeEl, { opacity: 0.55, duration: 0.55, ease: 'power2.out' }, 0.1);
+        } catch {
+          // ignore
+        }
+      })();
+    }, 6500);
     return () => {
       killed = true;
+      clearInterval(t);
     };
-  }, [banner.id]);
+  }, [list]);
 
   const content = (
     <div ref={rootRef} className="group relative w-full overflow-hidden rounded-3xl bg-slate-900 shadow-card">
       <div className="relative h-[140px] sm:h-[165px] md:h-[190px]">
-        <Image
-          src={banner.imageUrl}
-          alt={banner.title}
-          fill
-          sizes="(min-width: 1024px) 1152px, 100vw"
-          className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-        />
+        {/* Layer A */}
+        <div
+          ref={layerARef}
+          className={`absolute inset-0 ${activeLayer === 'a' ? 'z-20 opacity-100' : 'z-10 opacity-0'}`}
+        >
+          <Image
+            src={layerA.imageUrl}
+            alt={layerA.title}
+            fill
+            sizes="(min-width: 1024px) 1152px, 100vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+          />
+        </div>
+        {/* Layer B */}
+        <div
+          ref={layerBRef}
+          className={`absolute inset-0 ${activeLayer === 'b' ? 'z-20 opacity-100' : 'z-10 opacity-0'}`}
+        >
+          <Image
+            src={layerB.imageUrl}
+            alt={layerB.title}
+            fill
+            sizes="(min-width: 1024px) 1152px, 100vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+          />
+        </div>
+
         <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/10 to-transparent" />
         <div className="absolute inset-0 flex items-end p-4 sm:p-5">
           <div className="max-w-[92%] truncate rounded-full bg-black/35 px-3 py-1.5 text-xs font-semibold text-white/95 backdrop-blur">
-            {banner.title}
+            {activeBanner.title}
           </div>
         </div>
       </div>
     </div>
   );
 
-  if (isInternalHref(banner.href)) {
+  if (isInternalHref(activeBanner.href)) {
     return (
-      <Link href={banner.href} className="block" aria-label={banner.title}>
+      <Link href={activeBanner.href} className="block" aria-label={activeBanner.title}>
         {content}
       </Link>
     );
   }
 
   return (
-    <a href={banner.href} className="block" target="_blank" rel="noreferrer" aria-label={banner.title}>
+    <a href={activeBanner.href} className="block" target="_blank" rel="noreferrer" aria-label={activeBanner.title}>
       {content}
     </a>
   );

@@ -28,7 +28,7 @@ import {
 export default function HomePage() {
   const [sliderItems, setSliderItems] = useState<SliderItem[]>([]);
   const [slidesLoading, setSlidesLoading] = useState(true);
-  const [banner, setBanner] = useState<HomeBanner | null>(null);
+  const [banners, setBanners] = useState<HomeBanner[]>([]);
   const [bannerLoading, setBannerLoading] = useState(true);
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [newsLoading, setNewsLoading] = useState(true);
@@ -73,7 +73,7 @@ export default function HomePage() {
 
         const results = await Promise.allSettled([
           listSlidesPublic({ limit: 8 }),
-          fetchWithRetry(() => listBannersPublic({ limit: 1 }), 2),
+          fetchWithRetry(() => listBannersPublic({ limit: 10 }), 2),
           listNewsPublic({ page: 1, limit: 6 }),
           listAnnouncementsRecent(),
           listVideosRecent({ limit: 3 }),
@@ -84,7 +84,7 @@ export default function HomePage() {
         if (cancelled) return;
 
         const slides = results[0].status === 'fulfilled' ? results[0].value : null;
-        const banners = results[1].status === 'fulfilled' ? results[1].value : null;
+        const bannersRes = results[1].status === 'fulfilled' ? results[1].value : null;
         const news = results[2].status === 'fulfilled' ? results[2].value : null;
         const anns = results[3].status === 'fulfilled' ? results[3].value : null;
         const vids = results[4].status === 'fulfilled' ? results[4].value : null;
@@ -108,11 +108,8 @@ export default function HomePage() {
         }
         setSlidesLoading(false);
 
-        if (Array.isArray(banners) && banners.length) {
-          setBanner(banners[0] || null);
-        } else {
-          setBanner(null);
-        }
+        if (Array.isArray(bannersRes) && bannersRes.length) setBanners(bannersRes);
+        else setBanners([]);
         setBannerLoading(false);
 
         if (news?.items?.length) {
@@ -233,7 +230,7 @@ export default function HomePage() {
           <HeroSlider items={sliderItems} />
         )}
         <div className="mt-5">
-          <HomeBannerStrip banner={banner} loading={bannerLoading} />
+          <HomeBannerStrip banners={banners} loading={bannerLoading} />
         </div>
 
         {/* Content + Sidebar (desktop) */}
