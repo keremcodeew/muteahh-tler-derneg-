@@ -9,7 +9,7 @@ type Props = {
 export function NewsCard({ item }: Props) {
   return (
     <Link
-      href="#"
+      href={`/haberler/${encodeURIComponent(String(item.id))}`}
       className="group overflow-hidden rounded-3xl bg-white shadow-card transition-all hover:-translate-y-1 hover:shadow-card-hover"
     >
       <div className="relative aspect-[21/9] overflow-hidden">

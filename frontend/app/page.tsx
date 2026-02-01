@@ -342,9 +342,6 @@ export default function HomePage() {
               <div>
                 <div className="mb-5 flex items-center justify-between gap-3">
                   <h2 className="text-lg font-bold text-slate-900">Üyelikler / Partnerler</h2>
-                  <Link href="#" className="text-sm font-semibold text-burgundy hover:text-burgundy-dark">
-                    Tümünü Gör →
-                  </Link>
                 </div>
 
                 <LogoSlider logos={partnerLogos} />

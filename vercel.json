@@ -12,6 +12,7 @@
     { "source": "/duyurular", "destination": "/duyurular/", "permanent": true },
     { "source": "/haberler", "destination": "/haberler/", "permanent": true },
     { "source": "/videolar", "destination": "/videolar/", "permanent": true },
+    { "source": "/etkinlikler", "destination": "/etkinlikler/", "permanent": true },
     { "source": "/yayinlar", "destination": "/yayinlar/", "permanent": true },
     { "source": "/iletisim", "destination": "/iletisim/", "permanent": true }
   ],

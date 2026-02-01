@@ -144,7 +144,7 @@ export function Sidebar({ events, loadingEvents }: Props) {
       <div className="rounded-3xl bg-white p-5 shadow-card">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-bold text-slate-900">Etkinlikler</h3>
-          <Link href="#" className="text-sm font-semibold text-burgundy hover:text-burgundy-dark">
+          <Link href="/etkinlikler" className="text-sm font-semibold text-burgundy hover:text-burgundy-dark">
             Tümünü Gör →
           </Link>
         </div>

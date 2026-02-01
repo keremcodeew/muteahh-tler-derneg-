@@ -3,12 +3,26 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { getToken } from '../lib/api';
+import { useLang } from '../lib/lang';
 
 type NavItem = { href: string; label: string };
 
 export function Header() {
-  const navItems: NavItem[] = useMemo(
-    () => [
+  const { lang, setLang } = useLang();
+
+  const navItems: NavItem[] = useMemo(() => {
+    if (lang === 'EN') {
+      return [
+        { href: '/', label: 'Home' },
+        { href: '/kurumsal', label: 'Corporate' },
+        { href: '/uyelerimiz', label: 'Members' },
+        { href: '/duyurular', label: 'Announcements' },
+        { href: '/haberler', label: 'News' },
+        { href: '/yayinlar', label: 'Publications' },
+        { href: '/iletisim', label: 'Contact' },
+      ];
+    }
+    return [
       { href: '/', label: 'Ana Sayfa' },
       { href: '/kurumsal', label: 'Kurumsal' },
       { href: '/uyelerimiz', label: 'Üyelerimiz' },
@@ -16,11 +30,9 @@ export function Header() {
       { href: '/haberler', label: 'Haberler' },
       { href: '/yayinlar', label: 'Yayınlar' },
       { href: '/iletisim', label: 'İletişim' },
-    ],
-    []
-  );
+    ];
+  }, [lang]);
 
-  const [lang, setLang] = useState<'TR' | 'EN'>('TR');
   const [open, setOpen] = useState(false);
   const [hasToken, setHasToken] = useState(false);
 
@@ -97,7 +109,7 @@ export function Header() {
             href={hasToken ? '/profilim' : '/login'}
             className="rounded-full bg-burgundy px-4 py-2 text-sm font-semibold text-white shadow-card transition-all hover:-translate-y-0.5 hover:bg-burgundy-dark hover:shadow-card-hover"
           >
-            {hasToken ? 'Profilim' : 'ÜYE GİRİŞİ'}
+            {hasToken ? (lang === 'EN' ? 'My Profile' : 'Profilim') : lang === 'EN' ? 'MEMBER LOGIN' : 'ÜYE GİRİŞİ'}
           </Link>
 
           {/* Mobile menu button */}
