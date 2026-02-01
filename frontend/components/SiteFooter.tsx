@@ -6,7 +6,7 @@ export function SiteFooter() {
       <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
         <div>
           <p className="text-sm font-semibold text-white/90">Antalya Müteahhitler Derneği</p>
-          <p className="mt-1 text-xs text-white/70">Kurumsal ve sade tasarım • Next.js 14 • Tailwind • TypeScript</p>
+          <p className="mt-1 text-xs text-white/70">Antalya'nın Geleceğini Güvenle İnşa Ediyoruz</p>
           <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-white/70">
             <Link href="/kvkk" className="hover:text-white">
               KVKK
@@ -19,9 +19,6 @@ export function SiteFooter() {
             </Link>
             <Link href="/sms-geri-bildirim" className="hover:text-white">
               SMS ile Geri Bildirim
-            </Link>
-            <Link href="/blog" className="hover:text-white">
-              Blog
             </Link>
           </div>
         </div>

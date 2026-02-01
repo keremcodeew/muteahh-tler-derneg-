@@ -13,8 +13,7 @@
     { "source": "/haberler", "destination": "/haberler/", "permanent": true },
     { "source": "/videolar", "destination": "/videolar/", "permanent": true },
     { "source": "/yayinlar", "destination": "/yayinlar/", "permanent": true },
-    { "source": "/iletisim", "destination": "/iletisim/", "permanent": true },
-    { "source": "/blog", "destination": "/blog/", "permanent": true }
+    { "source": "/iletisim", "destination": "/iletisim/", "permanent": true }
   ],
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" }
