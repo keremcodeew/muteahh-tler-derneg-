@@ -90,6 +90,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [company, setCompany] = useState('');
   const [role, setRole] = useState('');
+  const [websiteUrl, setWebsiteUrl] = useState('');
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');
   const [phoneCountryCode, setPhoneCountryCode] = useState(COUNTRY_CODES[0]?.code || '+90');
@@ -166,6 +167,7 @@ export default function RegisterPage() {
                   password,
                   company: company.trim() ? company.trim() : undefined,
                   role: role.trim() ? role.trim() : undefined,
+                  websiteUrl: websiteUrl.trim() ? websiteUrl.trim() : undefined,
                   phoneCountryCode,
                   phoneNumber: pn,
                   kvkkAccepted: true,
@@ -246,6 +248,17 @@ export default function RegisterPage() {
                 className="mt-2 w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-burgundy"
                 placeholder="Firma adı"
               />
+            </div>
+
+            <div>
+              <label className="text-sm font-semibold text-slate-700">Web Sitesi (opsiyonel)</label>
+              <input
+                value={websiteUrl}
+                onChange={(e) => setWebsiteUrl(e.target.value)}
+                className="mt-2 w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-burgundy"
+                placeholder="https://firma.com"
+              />
+              <p className="mt-1 text-xs text-slate-500">Üyeler sayfasında firmanın üstüne tıklanınca bu adres açılır.</p>
             </div>
 
             <div>

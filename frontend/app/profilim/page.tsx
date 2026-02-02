@@ -50,6 +50,7 @@ export default function MyProfilePage() {
   const [name, setName] = useState('');
   const [company, setCompany] = useState('');
   const [role, setRole] = useState('');
+  const [websiteUrl, setWebsiteUrl] = useState('');
   const [profileImageUrl, setProfileImageUrl] = useState('');
   const [isPlatformAdmin, setIsPlatformAdmin] = useState(false);
 
@@ -109,6 +110,7 @@ export default function MyProfilePage() {
           setName(res.member.name || '');
           setCompany(res.member.company || '');
           setRole(res.member.role || '');
+          setWebsiteUrl(res.member.websiteUrl || '');
           setProfileImageUrl(res.member.profileImageUrl || '');
         }
       })
@@ -175,6 +177,7 @@ export default function MyProfilePage() {
                     company: company.trim() || null,
                     role: role.trim() || null,
                     profileImageUrl: profileImageUrl.trim() || null,
+                    websiteUrl: websiteUrl.trim() || null,
                   });
                   setOk(true);
                   setTimeout(() => setOk(false), 2200);
@@ -218,6 +221,19 @@ export default function MyProfilePage() {
                   id="profile_role"
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
+                  className="mt-2 w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-burgundy"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="profile_website" className="text-sm font-semibold text-slate-700">
+                  Web Sitesi
+                </label>
+                <input
+                  id="profile_website"
+                  value={websiteUrl}
+                  onChange={(e) => setWebsiteUrl(e.target.value)}
+                  placeholder="https://firma.com"
                   className="mt-2 w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-burgundy"
                 />
               </div>

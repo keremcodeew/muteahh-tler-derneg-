@@ -9,6 +9,7 @@ export type AuthMeResponse = {
     company: string | null;
     role: string | null;
     profileImageUrl: string | null;
+    websiteUrl?: string | null;
     joinDate: string;
   };
 };
@@ -21,6 +22,7 @@ export type MembersListResponse = {
     company: string | null;
     role: string | null;
     profileImageUrl: string | null;
+    websiteUrl?: string | null;
     joinDate: string;
     isApproved?: boolean;
     createdAt?: string;
@@ -223,6 +225,7 @@ export async function register(payload: {
   name: string;
   company?: string;
   role?: string;
+  websiteUrl?: string;
   phoneCountryCode: string;
   phoneNumber: string;
   kvkkAccepted: boolean;
@@ -280,7 +283,7 @@ export async function approveMember(token: string, memberId: number) {
 
 export async function updateMyMember(
   token: string,
-  updates: { name?: string; company?: string | null; role?: string | null; profileImageUrl?: string | null }
+  updates: { name?: string; company?: string | null; role?: string | null; profileImageUrl?: string | null; websiteUrl?: string | null }
 ) {
   return await apiFetch('/api/members/me', {
     method: 'PATCH',

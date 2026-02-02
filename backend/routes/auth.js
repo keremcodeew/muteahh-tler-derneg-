@@ -25,6 +25,7 @@ router.post(
     body('name').trim().notEmpty(),
     body('company').optional().trim(),
     body('role').optional().trim(),
+    body('websiteUrl').optional().trim().isLength({ max: 500 }),
     body('phoneCountryCode').trim().notEmpty().matches(/^\+\d{1,4}$/).withMessage('Geçersiz ülke kodu.'),
     body('phoneNumber').trim().notEmpty().matches(/^\d{4,15}$/).withMessage('Geçersiz telefon numarası.'),
     body('kvkkAccepted')
@@ -41,7 +42,7 @@ router.post(
   validate,
   async (req, res) => {
     try {
-      const { email, password, name, company, role, phoneCountryCode, phoneNumber } = req.body;
+      const { email, password, name, company, role, websiteUrl, phoneCountryCode, phoneNumber } = req.body;
       const existing = await db.User.findOne({ where: { email } });
       if (existing) {
         return res.status(400).json({ error: 'Email already registered.' });
@@ -60,6 +61,7 @@ router.post(
         email,
         company: company || null,
         role: role || null,
+        websiteUrl: websiteUrl || null,
         joinDate,
         isApproved: false,
         verificationStatus: 'pending_docs',
@@ -216,6 +218,7 @@ router.get('/me', auth, async (req, res) => {
         company: member.company,
         role: member.role,
         profileImageUrl: member.profileImageUrl,
+        websiteUrl: member.websiteUrl,
         joinDate: member.joinDate,
       } : null,
     });

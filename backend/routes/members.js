@@ -66,7 +66,7 @@ router.get(
         order: [['joinDate', 'DESC'], ['id', 'DESC']],
         limit,
         offset,
-        attributes: ['id', 'name', 'email', 'company', 'role', 'profileImageUrl', 'joinDate'],
+        attributes: ['id', 'name', 'email', 'company', 'role', 'profileImageUrl', 'websiteUrl', 'joinDate'],
       });
       res.json({ items: rows, total: count, page, limit, totalPages: Math.ceil(count / limit) });
     } catch (err) {
@@ -96,7 +96,7 @@ router.get('/admin/all', auth, adminOnly, async (req, res) => {
 router.get('/:id', [param('id').isInt().toInt()], validate, async (req, res) => {
   try {
     const member = await db.Member.findByPk(req.params.id, {
-      attributes: ['id', 'name', 'email', 'company', 'role', 'profileImageUrl', 'joinDate'],
+      attributes: ['id', 'name', 'email', 'company', 'role', 'profileImageUrl', 'websiteUrl', 'joinDate'],
     });
     if (!member) return res.status(404).json({ error: 'Member not found.' });
     if (!member.isApproved) return res.status(404).json({ error: 'Member not found.' });
@@ -115,6 +115,7 @@ router.patch(
     body('company').optional({ nullable: true }).trim().isLength({ max: 255 }),
     body('role').optional({ nullable: true }).trim().isLength({ max: 255 }),
     body('profileImageUrl').optional({ nullable: true }).trim().isLength({ max: 500 }),
+    body('websiteUrl').optional({ nullable: true }).trim().isLength({ max: 500 }),
   ],
   validate,
   async (req, res) => {
@@ -127,6 +128,7 @@ router.patch(
       if (req.body.company !== undefined) updates.company = req.body.company || null;
       if (req.body.role !== undefined) updates.role = req.body.role || null;
       if (req.body.profileImageUrl !== undefined) updates.profileImageUrl = req.body.profileImageUrl || null;
+      if (req.body.websiteUrl !== undefined) updates.websiteUrl = req.body.websiteUrl || null;
 
       await member.update(updates);
       res.json(member);

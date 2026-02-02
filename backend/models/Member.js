@@ -27,6 +27,9 @@ module.exports = (sequelize, DataTypes) => {
     profileImageUrl: {
       type: DataTypes.STRING(500),
     },
+    websiteUrl: {
+      type: DataTypes.STRING(500),
+    },
     joinDate: {
       type: DataTypes.DATEONLY,
       allowNull: false,
