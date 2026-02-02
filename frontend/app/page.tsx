@@ -16,7 +16,7 @@ import type { AnnouncementItem, EventItem, NewsItem, PartnerLogo, SliderItem, Vi
 import {
   listAnnouncementsRecent,
   listBannersPublic,
-  listEventsUpcoming,
+  listEventsPublic,
   listNewsPublic,
   listPartnersPublic,
   listPublicationsRecent,
@@ -80,7 +80,7 @@ export default function HomePage() {
           listAnnouncementsRecent(),
           listVideosRecent({ limit: 3 }),
           listPublicationsRecent({ limit: 3 }),
-          listEventsUpcoming({ limit: 5 }),
+          listEventsPublic({ page: 1, limit: 5 }),
           listPartnersPublic({ limit: 50 }),
         ]);
         if (cancelled) return;
@@ -91,7 +91,7 @@ export default function HomePage() {
         const anns = results[3].status === 'fulfilled' ? results[3].value : null;
         const vids = results[4].status === 'fulfilled' ? results[4].value : null;
         const pubs = results[5].status === 'fulfilled' ? results[5].value : null;
-        const upcoming = results[6].status === 'fulfilled' ? results[6].value : null;
+        const eventsRes = results[6].status === 'fulfilled' ? results[6].value : null;
         const partners = results[7].status === 'fulfilled' ? results[7].value : null;
 
         if (Array.isArray(slides) && slides.length) {
@@ -165,9 +165,9 @@ export default function HomePage() {
           setPublications([]);
         }
 
-        if (Array.isArray(upcoming)) {
+        if (eventsRes?.items && Array.isArray(eventsRes.items)) {
           setEvents(
-            upcoming.map((e) => ({
+            eventsRes.items.map((e) => ({
               id: String(e.id),
               title: e.title,
               date: e.dateText || (e.eventDate ? formatDot(e.eventDate) : ''),
