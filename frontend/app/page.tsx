@@ -73,26 +73,37 @@ export default function HomePage() {
           throw lastErr;
         };
 
-        const results = await Promise.allSettled([
-          listSlidesPublic({ limit: 8 }),
+        // Batch requests to reduce simultaneous serverless DB connections (helps avoid intermittent 500s).
+        const r1 = await Promise.allSettled([
+          fetchWithRetry(() => listSlidesPublic({ limit: 8 }), 1),
           fetchWithRetry(() => listBannersPublic({ limit: 10 }), 2),
-          listNewsPublic({ page: 1, limit: 6 }),
-          listAnnouncementsRecent(),
-          listVideosRecent({ limit: 3 }),
-          listPublicationsRecent({ limit: 3 }),
-          listEventsPublic({ page: 1, limit: 5 }),
-          listPartnersPublic({ limit: 50 }),
+          fetchWithRetry(() => listNewsPublic({ page: 1, limit: 6 }), 1),
         ]);
         if (cancelled) return;
 
-        const slides = results[0].status === 'fulfilled' ? results[0].value : null;
-        const bannersRes = results[1].status === 'fulfilled' ? results[1].value : null;
-        const news = results[2].status === 'fulfilled' ? results[2].value : null;
-        const anns = results[3].status === 'fulfilled' ? results[3].value : null;
-        const vids = results[4].status === 'fulfilled' ? results[4].value : null;
-        const pubs = results[5].status === 'fulfilled' ? results[5].value : null;
-        const eventsRes = results[6].status === 'fulfilled' ? results[6].value : null;
-        const partners = results[7].status === 'fulfilled' ? results[7].value : null;
+        const r2 = await Promise.allSettled([
+          fetchWithRetry(() => listAnnouncementsRecent(), 1),
+          fetchWithRetry(() => listVideosRecent({ limit: 3 }), 1),
+          fetchWithRetry(() => listPublicationsRecent({ limit: 3 }), 1),
+        ]);
+        if (cancelled) return;
+
+        const r3 = await Promise.allSettled([
+          fetchWithRetry(() => listEventsPublic({ page: 1, limit: 5 }), 1),
+          fetchWithRetry(() => listPartnersPublic({ limit: 50 }), 1),
+        ]);
+        if (cancelled) return;
+
+        const slides = r1[0].status === 'fulfilled' ? r1[0].value : null;
+        const bannersRes = r1[1].status === 'fulfilled' ? r1[1].value : null;
+        const news = r1[2].status === 'fulfilled' ? r1[2].value : null;
+
+        const anns = r2[0].status === 'fulfilled' ? r2[0].value : null;
+        const vids = r2[1].status === 'fulfilled' ? r2[1].value : null;
+        const pubs = r2[2].status === 'fulfilled' ? r2[2].value : null;
+
+        const eventsRes = r3[0].status === 'fulfilled' ? r3[0].value : null;
+        const partners = r3[1].status === 'fulfilled' ? r3[1].value : null;
 
         if (Array.isArray(slides) && slides.length) {
           setSliderItems(
