@@ -198,6 +198,8 @@ export default function HomePage() {
         <section className="mt-8 w-full sm:mt-10">
           <div className="grid w-full grid-cols-1 gap-8 lg:gap-10">
             <div className="space-y-10 sm:space-y-12">
+              <DigitalPlatformsSlider title="AMD DİJİTAL PLATFORMLAR" />
+
               <div>
                 <div className="mb-5 flex flex-wrap items-end justify-between gap-2">
                   <h2 className="text-lg font-bold text-slate-900">Güncel Haberler</h2>
@@ -217,8 +219,6 @@ export default function HomePage() {
                   </div>
                 ) : null}
               </div>
-
-              <DigitalPlatformsSlider title="AMD DİJİTAL PLATFORMLAR" />
 
               <div>
                 <div className="mb-5 flex flex-wrap items-end justify-between gap-2">
