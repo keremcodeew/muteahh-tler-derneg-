@@ -224,7 +224,7 @@ export default function HomePage() {
         {/* HERO / SLIDER */}
         {slidesLoading ? (
           <section className="relative w-full overflow-hidden rounded-3xl bg-soft-gray shadow-card">
-            <div className="h-[360px] animate-pulse md:h-[460px] lg:h-[520px]" />
+            <div className="h-[300px] animate-pulse sm:h-[360px] md:h-[460px] lg:h-[520px]" />
           </section>
         ) : (
           <HeroSlider items={sliderItems} />
@@ -234,20 +234,20 @@ export default function HomePage() {
         </div>
 
         {/* Content + Sidebar (desktop) */}
-        <section className="mt-10 w-full">
-          <div className="grid w-full grid-cols-1 gap-10 lg:grid-cols-[1fr_360px]">
+        <section className="mt-8 w-full sm:mt-10">
+          <div className="grid w-full grid-cols-1 gap-8 lg:grid-cols-[1fr_360px] lg:gap-10">
             {/* Main content */}
-            <div className="space-y-12">
+            <div className="space-y-10 sm:space-y-12">
               {/* Güncel Haberler */}
               <div>
-                <div className="mb-5 flex items-center justify-between gap-3">
+                <div className="mb-5 flex flex-wrap items-end justify-between gap-2">
                   <h2 className="text-lg font-bold text-slate-900">Güncel Haberler</h2>
-                  <Link href="/haberler" className="text-sm font-semibold text-burgundy hover:text-burgundy-dark">
+                  <Link href="/haberler" className="text-xs font-semibold text-burgundy hover:text-burgundy-dark sm:text-sm">
                     Tümünü Gör →
                   </Link>
                 </div>
 
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+                <div className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
                   {newsItems.slice(0, 6).map((item) => (
                     <NewsCard key={item.id} item={item} />
                   ))}
@@ -261,9 +261,9 @@ export default function HomePage() {
 
               {/* Güncel Duyurular */}
               <div className="w-full rounded-3xl bg-soft-gray p-4 sm:p-5">
-                <div className="mb-4 flex items-center justify-between gap-3">
+                <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
                   <h2 className="text-lg font-bold text-slate-900">Güncel Duyurular</h2>
-                    <Link href="/duyurular" className="text-sm font-semibold text-burgundy hover:text-burgundy-dark">
+                  <Link href="/duyurular" className="text-xs font-semibold text-burgundy hover:text-burgundy-dark sm:text-sm">
                     Tümünü Gör →
                   </Link>
                 </div>
@@ -282,14 +282,14 @@ export default function HomePage() {
 
               {/* Video Arşiv */}
               <div>
-                <div className="mb-5 flex items-center justify-between gap-3">
+                <div className="mb-5 flex flex-wrap items-end justify-between gap-2">
                   <h2 className="text-lg font-bold text-slate-900">Video Arşiv</h2>
-                  <Link href="/videolar" className="text-sm font-semibold text-burgundy hover:text-burgundy-dark">
+                  <Link href="/videolar" className="text-xs font-semibold text-burgundy hover:text-burgundy-dark sm:text-sm">
                     Tümünü Gör →
                   </Link>
                 </div>
 
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+                <div className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
                   {videoItems.slice(0, 3).map((item) => (
                     <VideoCard key={item.id} item={item} />
                   ))}
@@ -303,9 +303,9 @@ export default function HomePage() {
 
               {/* Yayınlar */}
               <div className="w-full rounded-3xl bg-white p-4 shadow-card sm:p-5">
-                <div className="mb-4 flex items-center justify-between gap-3">
+                <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
                   <h2 className="text-lg font-bold text-slate-900">Yayınlar</h2>
-                  <Link href="/yayinlar" className="text-sm font-semibold text-burgundy hover:text-burgundy-dark">
+                  <Link href="/yayinlar" className="text-xs font-semibold text-burgundy hover:text-burgundy-dark sm:text-sm">
                     Tümünü Gör →
                   </Link>
                 </div>
@@ -337,7 +337,7 @@ export default function HomePage() {
 
               {/* Üyelikler / Partner Logoları */}
               <div>
-                <div className="mb-5 flex items-center justify-between gap-3">
+                <div className="mb-5 flex flex-wrap items-end justify-between gap-2">
                   <h2 className="text-lg font-bold text-slate-900">Üyelikler / Partnerler</h2>
                 </div>
 
