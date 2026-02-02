@@ -1,10 +1,13 @@
 'use client';
 
+/* eslint-disable @next/next/no-img-element */
+
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { PageHero } from '../../components/PageHero';
 import { PageLayoutWithFooter } from '../../components/PageLayout';
 import { listMembersPublic, type MembersListResponse } from '../../lib/api';
+import { normalizeImageSrc } from '../../lib/normalizeImageSrc';
 
 type PublicMember = MembersListResponse['items'][number];
 
@@ -16,6 +19,16 @@ function normalizeWebsiteUrl(raw: string | null | undefined): string | null {
   if (lower.startsWith('http://') || lower.startsWith('https://')) return v;
   // allow "www.example.com" or "example.com"
   return `https://${v.replace(/^\/+/, '')}`;
+}
+
+function initialsFrom(name: string) {
+  const s = (name || '').trim();
+  if (!s) return 'AMD';
+  const parts = s.split(/\s+/).filter(Boolean);
+  const first = parts[0]?.[0] || '';
+  const last = parts.length > 1 ? parts[parts.length - 1]?.[0] || '' : '';
+  const out = (first + last).toUpperCase();
+  return out || 'AMD';
 }
 
 function MembersPageInner() {
@@ -63,14 +76,14 @@ function MembersPageInner() {
     <PageLayoutWithFooter>
       <PageHero
         title="Üyelerimiz"
-        subtitle="Kayıt olan ve onaylanan üyelerimizi burada görüntüleyebilirsiniz. (Onaysız üyeler listelenmez.) Üyenin üzerine tıklayınca web sitesi açılır."
+        subtitle="Kayıt olan ve onaylanan üyelerimizi burada görüntüleyebilirsiniz. (Onaysız üyeler listelenmez.)"
       />
 
       <section className="mt-8 rounded-3xl bg-white p-6 shadow-card">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2 className="text-lg font-bold text-slate-900">Üye Dizini</h2>
-            <p className="mt-1 text-sm text-slate-600">İsim / firma / ünvan ile arayabilirsiniz.</p>
+            <p className="mt-1 text-sm text-slate-600">Üyenin kartına tıklayınca web sitesi açılır.</p>
           </div>
 
           <div className="flex w-full gap-2 sm:w-auto">
@@ -81,62 +94,64 @@ function MembersPageInner() {
                 setPage(1);
               }}
               placeholder="Arama…"
-              className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-burgundy sm:w-[320px]"
+              className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-burgundy sm:w-[360px]"
             />
           </div>
         </div>
 
         {error ? <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
 
-        <div className="mt-6 space-y-0 overflow-hidden rounded-3xl border border-black/5">
+        <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {loading
-            ? Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-4 border-b border-black/5 bg-white px-5 py-5 last:border-b-0">
-                  <div className="h-7 w-12 rounded bg-slate-200" />
-                  <div className="min-w-0 flex-1">
-                    <div className="h-4 w-2/3 rounded bg-slate-200" />
-                    <div className="mt-3 h-3 w-1/2 rounded bg-slate-200" />
-                  </div>
+            ? Array.from({ length: 10 }).map((_, i) => (
+                <div key={i} className="h-[260px] rounded bg-soft-gray shadow-card">
+                  <div className="h-full animate-pulse" />
                 </div>
               ))
-            : items.map((m, idx) => {
+            : items.map((m) => {
                 const href = normalizeWebsiteUrl(m.websiteUrl);
-                const companyOrName = (m.company || m.name || '').trim();
-                const personName = m.company ? m.name : m.role || '';
+                const company = (m.company || m.name || '—').trim();
+                const person = (m.company ? m.name : m.role) || '—';
 
-                const Row = (
-                  <div
-                    className={`flex items-center gap-4 border-b border-black/5 px-5 py-5 transition-colors ${
-                      href ? 'bg-white hover:bg-soft-gray' : 'bg-white'
-                    } last:border-b-0`}
-                  >
-                    <div className="w-14 shrink-0 text-right text-2xl font-extrabold tracking-tight text-slate-500">
-                      {m.id}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex min-w-0 items-center justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="truncate text-base font-extrabold text-slate-900 sm:text-lg">{companyOrName || '—'}</div>
-                          <div className="mt-1 truncate text-sm font-semibold text-slate-700">{personName || '—'}</div>
-                        </div>
-                        <div className="shrink-0 text-xs font-semibold text-slate-500">
-                          {href ? 'Web Sitesi →' : 'Web sitesi yok'}
-                        </div>
+                const logoSrc = normalizeImageSrc(m.profileImageUrl);
+                const Card = (
+                  <div className="group h-[260px] rounded bg-white shadow-card ring-1 ring-black/10 transition-transform hover:-translate-y-0.5">
+                    <div className="flex h-full flex-col p-5">
+                      <div className="grid flex-1 place-items-center rounded bg-white">
+                        {logoSrc ? (
+                          <img
+                            src={logoSrc}
+                            alt={company}
+                            className="max-h-[120px] w-auto max-w-[180px] object-contain"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="grid size-24 place-items-center rounded-full bg-soft-gray text-2xl font-extrabold tracking-wide text-slate-600">
+                            {initialsFrom(company)}
+                          </div>
+                        )}
+                      </div>
+                      <div className="mt-4 text-center">
+                        <div className="truncate text-sm font-extrabold uppercase tracking-wide text-slate-700">{company}</div>
+                        <div className="mt-1 truncate text-sm font-semibold text-slate-500">{person}</div>
+                      </div>
+                      <div className="mt-4 text-center text-xs font-semibold text-slate-400">
+                        {href ? <span className="text-burgundy group-hover:text-burgundy-dark">Web Sitesi →</span> : 'Web sitesi yok'}
                       </div>
                     </div>
                   </div>
                 );
 
-                if (!href) return <div key={m.id || idx}>{Row}</div>;
+                if (!href) return <div key={m.id}>{Card}</div>;
                 return (
                   <a key={m.id} href={href} target="_blank" rel="noreferrer" className="block">
-                    {Row}
+                    {Card}
                   </a>
                 );
               })}
         </div>
 
-        <div className="mt-6 flex items-center justify-between">
+        <div className="mt-8 flex items-center justify-between">
           <button
             type="button"
             className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-slate-700 disabled:opacity-50"
