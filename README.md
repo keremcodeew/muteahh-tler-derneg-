@@ -67,8 +67,7 @@ npm run dev
 
 ## İsteğe bağlı: PostgreSQL (yerel)
 
-PostgreSQL kullanmak istersen: PostgreSQL’i kur, `muteahhitler_dernegi` veritabanını oluştur, `backend/.env` içine `DATABASE_URL=postgresql://kullanici:sifre@localhost:5432/muteahhitler_dernegi` ekle. Uygulama otomatik olarak PostgreSQL’e bağlanır; yoksa SQLite kullanmaya devam eder.
-
+PostgreSQL kullanmak istersen: PostgreSQL’i kur, `muteahhitler_dernegi` veritabanını oluştur, `backend/.env` içine `DATABASE_URL=postgresql://kullanici:sifre@localhost:5432/muteahhitler_dernegi` ekle. Uygulama otomatik olarak PostgreSQL’e bağlanır.
 ## Vercel’e deploy (veritabanı dahil)
 
 Proje Vercel’de çalışacak şekilde ayarlı: hem frontend hem API aynı domainde, veritabanı için **hosted PostgreSQL** kullanılır (Vercel’de SQLite kullanılamaz).
@@ -99,7 +98,7 @@ Projeyi Vercel’e bağla (GitHub/GitLab/Bitbucket veya `vercel` CLI). Build sı
 ```
 mt/
 ├── backend/
-│   ├── database.sqlite # SQLite kullanılıyorsa otomatik oluşur
+│   ├── database.sqlite   # (opsiyonel) yalnızca yerelde SQLite kullanılırsa oluşur
 │   ├── middleware/     # auth, adminOnly
 │   ├── models/         # User, News, Announcement, Member
 │   ├── routes/         # auth, news, announcements, members

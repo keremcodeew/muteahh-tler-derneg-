@@ -5,18 +5,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { Header } from '../components/Header';
 import { HeroSlider } from '../components/HeroSlider';
 import { HomeBannerStrip } from '../components/HomeBannerStrip';
-import { Sidebar } from '../components/Sidebar';
 import { NewsCard } from '../components/NewsCard';
-import { AnnouncementCard } from '../components/AnnouncementCard';
+import { DigitalPlatformsSlider } from '../components/DigitalPlatformsSlider';
 import { VideoCard } from '../components/VideoCard';
 import { VideoPlayerModal } from '../components/VideoPlayerModal';
 import { LogoSlider } from '../components/LogoSlider';
 import { SiteFooter } from '../components/SiteFooter';
-import type { AnnouncementItem, EventItem, NewsItem, PartnerLogo, SliderItem, VideoItem } from '../lib/types';
+import type { NewsItem, PartnerLogo, SliderItem, VideoItem } from '../lib/types';
 import {
-  listAnnouncementsRecent,
   listBannersPublic,
-  listEventsPublic,
   listNewsPublic,
   listPartnersPublic,
   listPublicationsRecent,
@@ -33,14 +30,10 @@ export default function HomePage() {
   const [bannerLoading, setBannerLoading] = useState(true);
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [newsLoading, setNewsLoading] = useState(true);
-  const [announcements, setAnnouncements] = useState<AnnouncementItem[]>([]);
-  const [announcementsLoading, setAnnouncementsLoading] = useState(true);
   const [videoItems, setVideoItems] = useState<VideoItem[]>([]);
   const [videosLoading, setVideosLoading] = useState(true);
   const [videoPreview, setVideoPreview] = useState<{ url: string; title: string } | null>(null);
   const [publications, setPublications] = useState<Publication[]>([]);
-  const [events, setEvents] = useState<EventItem[]>([]);
-  const [eventsLoading, setEventsLoading] = useState(true);
   const [partnerLogos, setPartnerLogos] = useState<PartnerLogo[]>([]);
   const [partnersLoading, setPartnersLoading] = useState(true);
 
@@ -82,14 +75,8 @@ export default function HomePage() {
         if (cancelled) return;
 
         const r2 = await Promise.allSettled([
-          fetchWithRetry(() => listAnnouncementsRecent(), 1),
           fetchWithRetry(() => listVideosRecent({ limit: 3 }), 1),
           fetchWithRetry(() => listPublicationsRecent({ limit: 3 }), 1),
-        ]);
-        if (cancelled) return;
-
-        const r3 = await Promise.allSettled([
-          fetchWithRetry(() => listEventsPublic({ page: 1, limit: 5 }), 1),
           fetchWithRetry(() => listPartnersPublic({ limit: 50 }), 1),
         ]);
         if (cancelled) return;
@@ -98,12 +85,9 @@ export default function HomePage() {
         const bannersRes = r1[1].status === 'fulfilled' ? r1[1].value : null;
         const news = r1[2].status === 'fulfilled' ? r1[2].value : null;
 
-        const anns = r2[0].status === 'fulfilled' ? r2[0].value : null;
-        const vids = r2[1].status === 'fulfilled' ? r2[1].value : null;
-        const pubs = r2[2].status === 'fulfilled' ? r2[2].value : null;
-
-        const eventsRes = r3[0].status === 'fulfilled' ? r3[0].value : null;
-        const partners = r3[1].status === 'fulfilled' ? r3[1].value : null;
+        const vids = r2[0].status === 'fulfilled' ? r2[0].value : null;
+        const pubs = r2[1].status === 'fulfilled' ? r2[1].value : null;
+        const partners = r2[2].status === 'fulfilled' ? r2[2].value : null;
 
         if (Array.isArray(slides) && slides.length) {
           setSliderItems(
@@ -140,20 +124,6 @@ export default function HomePage() {
         }
         setNewsLoading(false);
 
-        if (Array.isArray(anns) && anns.length) {
-          setAnnouncements(
-            anns.map((a) => ({
-              id: String(a.id),
-              code: a.code || `AMD-${String(a.publishDate || '').slice(0, 4) || '2026'}-${a.id}`,
-              date: formatDot(a.publishDate),
-              title: a.title,
-            }))
-          );
-        } else {
-          setAnnouncements([]);
-        }
-        setAnnouncementsLoading(false);
-
         if (Array.isArray(vids) && vids.length) {
           setVideoItems(
             vids.map((v) => ({
@@ -176,23 +146,6 @@ export default function HomePage() {
           setPublications([]);
         }
 
-        if (eventsRes?.items && Array.isArray(eventsRes.items)) {
-          setEvents(
-            eventsRes.items.map((e) => ({
-              id: String(e.id),
-              title: e.title,
-              date: e.dateText || (e.eventDate ? formatDot(e.eventDate) : ''),
-              location: e.location || '',
-              color: (e.color as any) || 'burgundy',
-            }))
-          );
-          setEventsLoading(false);
-        } else {
-          // Do not show dummy events; keep empty.
-          setEvents([]);
-          setEventsLoading(false);
-        }
-
         if (Array.isArray(partners)) {
           setPartnerLogos(
             partners.map((p) => ({
@@ -209,16 +162,13 @@ export default function HomePage() {
         // Do not show dummy content on errors.
         setSliderItems([]);
         setNewsItems([]);
-        setAnnouncements([]);
         setVideoItems([]);
         setPartnerLogos([]);
         setPublications([]);
         setSlidesLoading(false);
         setBannerLoading(false);
         setNewsLoading(false);
-        setAnnouncementsLoading(false);
         setVideosLoading(false);
-        setEventsLoading(false);
         setPartnersLoading(false);
       }
     }
@@ -246,7 +196,7 @@ export default function HomePage() {
         </div>
 
         <section className="mt-8 w-full sm:mt-10">
-          <div className="grid w-full grid-cols-1 gap-8 lg:grid-cols-[1fr_360px] lg:gap-10">
+          <div className="grid w-full grid-cols-1 gap-8 lg:gap-10">
             <div className="space-y-10 sm:space-y-12">
               <div>
                 <div className="mb-5 flex flex-wrap items-end justify-between gap-2">
@@ -268,25 +218,7 @@ export default function HomePage() {
                 ) : null}
               </div>
 
-              <div className="w-full rounded-3xl bg-soft-gray p-4 sm:p-5">
-                <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
-                  <h2 className="text-lg font-bold text-slate-900">Güncel Duyurular</h2>
-                  <Link href="/duyurular" className="text-xs font-semibold text-burgundy hover:text-burgundy-dark sm:text-sm">
-                    Tümünü Gör →
-                  </Link>
-                </div>
-
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                  {announcements.slice(0, 4).map((item) => (
-                    <AnnouncementCard key={item.id} item={item} />
-                  ))}
-                </div>
-                {!announcementsLoading && announcements.length === 0 ? (
-                  <div className="mt-4 rounded-3xl border border-black/5 bg-white px-4 py-3 text-sm text-slate-600">
-                    Henüz duyuru eklenmemiş.
-                  </div>
-                ) : null}
-              </div>
+              <DigitalPlatformsSlider title="AMD DİJİTAL PLATFORMLAR" />
 
               <div>
                 <div className="mb-5 flex flex-wrap items-end justify-between gap-2">
@@ -359,12 +291,6 @@ export default function HomePage() {
                     Henüz partner eklenmemiş.
                   </div>
                 ) : null}
-              </div>
-            </div>
-
-            <div>
-              <div className="lg:sticky lg:top-24">
-                <Sidebar events={events} loadingEvents={eventsLoading} />
               </div>
             </div>
           </div>
