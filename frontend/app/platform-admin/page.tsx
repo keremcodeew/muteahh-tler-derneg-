@@ -538,9 +538,9 @@ function MembersPanel({
       {error ? <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
 
       <div className="mt-6 overflow-hidden rounded-3xl border border-black/5">
-        <div className="grid grid-cols-[1fr_260px] bg-soft-gray px-4 py-3 text-xs font-bold uppercase tracking-wide text-slate-600">
+        <div className="grid grid-cols-1 gap-2 bg-soft-gray px-4 py-3 text-xs font-bold uppercase tracking-wide text-slate-600 sm:grid-cols-[1fr_260px] sm:gap-0">
           <div>Üye</div>
-          <div className="text-right">İşlem</div>
+          <div className="hidden text-right sm:block">İşlem</div>
         </div>
 
         <div className="divide-y divide-black/5">
@@ -548,7 +548,7 @@ function MembersPanel({
             const isApproved = m.isApproved !== false;
             const status = String(m.verificationStatus || (isApproved ? 'approved' : 'pending_docs'));
             return (
-              <div key={m.id} className="grid grid-cols-[1fr_260px] items-center px-4 py-4">
+              <div key={m.id} className="grid grid-cols-1 gap-3 px-4 py-4 sm:grid-cols-[1fr_260px] sm:items-center sm:gap-0">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="truncate text-sm font-bold text-slate-900">{m.name}</p>
@@ -567,8 +567,8 @@ function MembersPanel({
                   <p className="mt-1 truncate text-xs text-slate-400">{m.email}</p>
                 </div>
 
-                <div className="text-right">
-                  <div className="flex flex-wrap justify-end gap-2">
+                <div className="sm:text-right">
+                  <div className="flex flex-wrap justify-start gap-2 sm:justify-end">
                     <button
                       type="button"
                       className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-soft-gray disabled:opacity-50"

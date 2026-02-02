@@ -213,7 +213,7 @@ export default function RegisterPage() {
 
             <div>
               <label className="text-sm font-semibold text-slate-700">Telefon</label>
-              <div className="mt-2 grid grid-cols-[140px_1fr] gap-3">
+              <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-[140px_1fr]">
                 <select
                   value={phoneCountryCode}
                   onChange={(e) => setPhoneCountryCode(e.target.value)}
