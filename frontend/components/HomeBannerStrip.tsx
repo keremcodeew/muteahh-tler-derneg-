@@ -113,7 +113,7 @@ export function HomeBannerStrip({ banners, loading }: { banners: HomeBanner[]; l
 
   const content = (
     <div ref={rootRef} className="group relative w-full overflow-hidden rounded-3xl bg-slate-900 shadow-card">
-      <div className="relative h-[140px] sm:h-[165px] md:h-[190px]">
+      <div className="relative h-[450px] w-full" style={{ aspectRatio: '1920 / 450' }}>
         {/* Layer A */}
         <div
           ref={layerARef}
@@ -123,8 +123,8 @@ export function HomeBannerStrip({ banners, loading }: { banners: HomeBanner[]; l
             src={normalizeImageSrc(layerAEffective.imageUrl)}
             alt={layerAEffective.title}
             fill
-            sizes="(min-width: 1920px) 1950px, 100vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+            sizes="(min-width: 1920px) 1920px, 100vw"
+            className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
           />
         </div>
         {/* Layer B */}
@@ -136,8 +136,8 @@ export function HomeBannerStrip({ banners, loading }: { banners: HomeBanner[]; l
             src={normalizeImageSrc(layerBEffective.imageUrl)}
             alt={layerBEffective.title}
             fill
-            sizes="(min-width: 1920px) 1950px, 100vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+            sizes="(min-width: 1920px) 1920px, 100vw"
+            className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
           />
         </div>
 
