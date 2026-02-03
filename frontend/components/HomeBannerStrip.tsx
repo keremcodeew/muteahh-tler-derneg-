@@ -54,16 +54,11 @@ export function HomeBannerStrip({ banners, loading }: { banners: HomeBanner[]; l
       const nextIndex = (currentIndexRef.current + 1) % len;
       const nextBanner = list[nextIndex];
 
-      // Put next banner into the hidden layer
+      // Put next banner into the hidden layer (React will re-render with new image)
       if (toLayer === 'a') setLayerA(nextBanner);
       else setLayerB(nextBanner);
 
-      // Update title/href immediately to match the incoming banner
-      setActiveLayer(toLayer);
-      activeLayerRef.current = toLayer;
-      currentIndexRef.current = nextIndex;
-
-      // Animate transition
+      // Animasyon bitince activeLayer güncellenir (CSS ile GSAP çakışması önlenir)
       (async () => {
         try {
           const mod: any = await import('gsap');
@@ -74,21 +69,25 @@ export function HomeBannerStrip({ banners, loading }: { banners: HomeBanner[]; l
           const nextEl = toLayer === 'a' ? layerARef.current : layerBRef.current;
           if (!activeEl || !nextEl) return;
 
-          // Marvel-like wipe (left->right) with scale punch
-          gsap.set(nextEl, { opacity: 1, zIndex: 3, clipPath: 'inset(0 100% 0 0)', scale: 1.06 });
-          gsap.set(activeEl, { opacity: 1, zIndex: 2, clipPath: 'inset(0 0% 0 0)', scale: 1 });
+          // Çıkış katmanı üstte, giriş altta - crossfade için
+          gsap.set(activeEl, { opacity: 1, zIndex: 2 });
+          gsap.set(nextEl, { opacity: 0, zIndex: 1 });
 
           const tl = gsap.timeline({
             onComplete: () => {
-              gsap.set(activeEl, { opacity: 0, zIndex: 1, clipPath: 'inset(0 0% 0 0)', scale: 1 });
-              gsap.set(nextEl, { opacity: 1, zIndex: 2, clipPath: 'inset(0 0% 0 0)', scale: 1 });
+              gsap.set(activeEl, { opacity: 0, zIndex: 1 });
+              gsap.set(nextEl, { opacity: 1, zIndex: 2 });
+              setActiveLayer(toLayer);
+              activeLayerRef.current = toLayer;
+              currentIndexRef.current = nextIndex;
             },
           });
-          tl.to(activeEl, { scale: 1.03, duration: 0.6, ease: 'power2.out' }, 0);
-          tl.to(nextEl, { clipPath: 'inset(0 0% 0 0)', scale: 1, duration: 0.85, ease: 'power3.inOut' }, 0);
-          tl.to(activeEl, { opacity: 0.55, duration: 0.55, ease: 'power2.out' }, 0.1);
+          tl.to(activeEl, { opacity: 0, duration: 0.7, ease: 'power2.in' }, 0);
+          tl.to(nextEl, { opacity: 1, duration: 0.7, ease: 'power2.out' }, 0);
         } catch {
-          // ignore
+          setActiveLayer(toLayer);
+          activeLayerRef.current = toLayer;
+          currentIndexRef.current = nextIndex;
         }
       })();
     }, 6500);
@@ -114,10 +113,11 @@ export function HomeBannerStrip({ banners, loading }: { banners: HomeBanner[]; l
   const content = (
     <div ref={rootRef} className="group relative w-full overflow-hidden rounded-3xl bg-slate-900 shadow-card">
       <div className="relative h-[450px] w-full" style={{ aspectRatio: '1920 / 450' }}>
-        {/* Layer A */}
+        {/* Layer A - animasyon dışında opacity activeLayer ile, animasyonda GSAP kontrolü */}
         <div
           ref={layerARef}
-          className={`absolute inset-0 ${activeLayer === 'a' ? 'z-20 opacity-100' : 'z-10 opacity-0'}`}
+          className="absolute inset-0"
+          style={{ opacity: activeLayer === 'a' ? 1 : 0, zIndex: activeLayer === 'a' ? 2 : 1 }}
         >
           <Image
             src={normalizeImageSrc(layerAEffective.imageUrl)}
@@ -127,10 +127,11 @@ export function HomeBannerStrip({ banners, loading }: { banners: HomeBanner[]; l
             className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
           />
         </div>
-        {/* Layer B */}
+        {/* Layer B - animasyon dışında opacity activeLayer ile, animasyonda GSAP kontrolü */}
         <div
           ref={layerBRef}
-          className={`absolute inset-0 ${activeLayer === 'b' ? 'z-20 opacity-100' : 'z-10 opacity-0'}`}
+          className="absolute inset-0"
+          style={{ opacity: activeLayer === 'b' ? 1 : 0, zIndex: activeLayer === 'b' ? 2 : 1 }}
         >
           <Image
             src={normalizeImageSrc(layerBEffective.imageUrl)}
