@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export function SiteFooter() {
   return (
-    <div className="mt-14 w-full rounded-3xl bg-slate-900 px-4 py-10 text-white sm:px-6">
+    <div className="mt-14 w-full max-w-full overflow-hidden rounded-3xl bg-slate-900 px-4 py-10 text-white sm:px-6">
       <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
         <div>
           <p className="text-sm font-semibold text-white/90">Antalya İnşaat Müteahhitleri Derneği</p>

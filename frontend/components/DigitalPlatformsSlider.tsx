@@ -111,11 +111,11 @@ function PlatformBlock({
         <div ref={gradientRef} className="absolute inset-0 bg-gradient-to-r from-red-950/40 via-red-900/20 to-red-800/30" />
       </div>
 
-      <div className="relative w-full px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
-        <div className={`flex w-full ${align === 'right' ? 'justify-end' : 'justify-start'}`}>
+      <div className="relative w-full min-w-0 px-4 py-10 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+        <div className={`flex w-full min-w-0 ${align === 'right' ? 'justify-end' : 'justify-start'}`}>
           <div
             ref={contentRef}
-            className={`w-full ${align === 'right' ? 'text-right' : 'text-left'}`}
+            className={`min-w-0 flex-1 ${align === 'right' ? 'text-right' : 'text-left'}`}
           >
             <div
               ref={pillRef}
@@ -253,10 +253,14 @@ export function DigitalPlatformsSlider({
     let obs: IntersectionObserver | null = null;
     let disconnected = false;
 
-    const containerEls = contentElsRef.current.filter(Boolean) as HTMLDivElement[];
-    if (!containerEls.length) return;
+    const runObserver = async () => {
+      await new Promise((r) => requestAnimationFrame(r));
+      await new Promise((r) => setTimeout(r, 50));
+      if (disconnected) return;
 
-    (async () => {
+      const containerEls = contentElsRef.current.filter(Boolean) as HTMLDivElement[];
+      if (!containerEls.length) return;
+
       try {
         const mod: any = await import('gsap');
         const gsap = mod?.gsap || mod?.default || mod;
@@ -546,7 +550,9 @@ export function DigitalPlatformsSlider({
         for (const el of containerEls) obs.observe(el);
       } catch {
       }
-    })();
+    };
+
+    runObserver();
 
     return () => {
       disconnected = true;
@@ -557,7 +563,7 @@ export function DigitalPlatformsSlider({
   if (!list.length) return null;
 
   return (
-    <section className="w-full" aria-label="Dijital platformlar">
+    <section className="w-full max-w-full overflow-hidden" aria-label="Dijital platformlar">
       <div className="mb-6">
         <h2 className="text-center text-xl font-extrabold tracking-wide text-slate-900 sm:text-2xl lg:text-3xl">
           {title}

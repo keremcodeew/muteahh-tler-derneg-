@@ -211,10 +211,10 @@ export default function HomePage() {
   }, [formatDot]);
 
   return (
-    <div className="min-h-screen w-full bg-white">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-white">
       <Header />
 
-      <main className="w-full px-4 pb-16 pt-6 sm:px-6 lg:px-8">
+      <main className="w-full max-w-full overflow-x-hidden px-4 pb-16 pt-6 sm:px-6 lg:px-8">
         {slidesLoading ? (
           <section className="relative w-full overflow-hidden rounded-3xl bg-soft-gray shadow-card">
             <div className="h-[300px] animate-pulse sm:h-[360px] md:h-[460px] lg:h-[520px]" />

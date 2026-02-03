@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { PageHero } from '../../components/PageHero';
 import { PageLayoutWithFooter } from '../../components/PageLayout';
+import { ImageUrlInput } from '../../components/ImageUrlInput';
 import {
   approveMember,
   clearToken,
@@ -1048,7 +1049,7 @@ function SlidesPanel({ token }: { token: string | null }) {
             <TextInput value={dateText} onChange={(e) => setDateText(e.target.value)} placeholder="27 Ocak 2026" />
           </Field>
           <Field label="Görsel URL (opsiyonel)">
-            <TextInput value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://..." />
+            <ImageUrlInput value={imageUrl} onChange={setImageUrl} placeholder="URL veya dosya seçin" />
           </Field>
           <Field label="Link (opsiyonel)">
             <TextInput value={href} onChange={(e) => setHref(e.target.value)} placeholder="/haberler/1 veya https://..." />
@@ -1186,9 +1187,10 @@ function SlidesPanel({ token }: { token: string | null }) {
                     />
                   </Field>
                   <Field label="Görsel URL">
-                    <TextInput
+                    <ImageUrlInput
                       value={String(edit.imageUrl ?? '')}
-                      onChange={(e) => setEdit((s) => ({ ...s, imageUrl: e.target.value }))}
+                      onChange={(v) => setEdit((s) => ({ ...s, imageUrl: v }))}
+                      placeholder="URL veya dosya seçin"
                     />
                   </Field>
                   <Field label="Link">
@@ -1259,7 +1261,7 @@ function BannersPanel({ token }: { token: string | null }) {
       remove={(t, id) => deleteBanner(t, id)}
       fields={[
         { key: 'title', label: 'Başlık (Alt yazı)', type: 'text', required: true },
-        { key: 'imageUrl', label: 'Banner Görsel URL', type: 'text', required: true },
+        { key: 'imageUrl', label: 'Banner Görsel URL', type: 'imageUrl', required: true },
         { key: 'href', label: 'Tıklayınca gideceği link', type: 'text', required: true },
         { key: 'sortOrder', label: 'Sıralama', type: 'text' },
       ]}
@@ -1279,7 +1281,7 @@ function NewsPanel({ token }: { token: string | null }) {
     fields={[
       { key: 'title', label: 'Başlık', type: 'text', required: true },
       { key: 'publishDate', label: 'Tarih (YYYY-MM-DD)', type: 'text' },
-      { key: 'imageUrl', label: 'Görsel URL', type: 'text' },
+      { key: 'imageUrl', label: 'Görsel URL', type: 'imageUrl' },
       { key: 'excerpt', label: 'Özet', type: 'textarea' },
       { key: 'content', label: 'İçerik', type: 'textarea', required: true },
     ]}
@@ -1300,7 +1302,7 @@ function AnnouncementsPanel({ token }: { token: string | null }) {
       { key: 'title', label: 'Başlık', type: 'text', required: true },
       { key: 'publishDate', label: 'Tarih (YYYY-MM-DD)', type: 'text' },
       { key: 'eventDate', label: 'Etkinlik Tarihi (opsiyonel)', type: 'text' },
-      { key: 'imageUrl', label: 'Görsel URL', type: 'text' },
+      { key: 'imageUrl', label: 'Görsel URL', type: 'imageUrl' },
       { key: 'excerpt', label: 'Özet', type: 'textarea' },
       { key: 'content', label: 'İçerik', type: 'textarea', required: true },
     ]}
@@ -1338,7 +1340,7 @@ function PublicationsPanel({ token }: { token: string | null }) {
     fields={[
       { key: 'title', label: 'Başlık', type: 'text', required: true },
       { key: 'publishDate', label: 'Tarih (YYYY-MM-DD)', type: 'text' },
-      { key: 'coverImageUrl', label: 'Kapak Görsel URL', type: 'text' },
+      { key: 'coverImageUrl', label: 'Kapak Görsel URL', type: 'imageUrl' },
       { key: 'fileUrl', label: 'Dosya URL (PDF)', type: 'text' },
       { key: 'excerpt', label: 'Özet', type: 'textarea' },
     ]}
@@ -1380,7 +1382,7 @@ function PartnersPanel({ token }: { token: string | null }) {
       fields={[
         { key: 'title', label: 'Partner Adı', type: 'text', required: true },
         { key: 'logoText', label: 'Logo Yazısı (UI)', type: 'text' },
-        { key: 'logoUrl', label: 'Logo URL (opsiyonel)', type: 'text' },
+        { key: 'logoUrl', label: 'Logo URL (opsiyonel)', type: 'imageUrl' },
         { key: 'websiteUrl', label: 'Web Sitesi URL (opsiyonel)', type: 'text' },
         { key: 'sortOrder', label: 'Sıralama', type: 'text' },
       ]}
@@ -1388,7 +1390,7 @@ function PartnersPanel({ token }: { token: string | null }) {
   );
 }
 
-type GenericField = { key: string; label: string; type: 'text' | 'textarea'; required?: boolean };
+type GenericField = { key: string; label: string; type: 'text' | 'textarea' | 'imageUrl'; required?: boolean };
 
 function GenericContentPanel<T extends { id: number; title: string; isPublished: boolean }>({
   token,
@@ -1492,13 +1494,19 @@ function GenericContentPanel<T extends { id: number; title: string; isPublished:
 
         <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
           {fields.map((f) => (
-            <div key={f.key} className={f.type === 'textarea' ? 'md:col-span-2' : ''}>
+            <div key={f.key} className={f.type === 'textarea' || f.type === 'imageUrl' ? 'md:col-span-2' : ''}>
               <Field label={f.label}>
                 {f.type === 'textarea' ? (
                   <TextArea
                     rows={3}
                     value={String(createForm[f.key] ?? '')}
                     onChange={(e) => setCreateForm((s) => ({ ...s, [f.key]: e.target.value }))}
+                  />
+                ) : f.type === 'imageUrl' ? (
+                  <ImageUrlInput
+                    value={String(createForm[f.key] ?? '')}
+                    onChange={(v) => setCreateForm((s) => ({ ...s, [f.key]: v }))}
+                    placeholder="URL veya dosya seçin"
                   />
                 ) : (
                   <TextInput
@@ -1617,13 +1625,19 @@ function GenericContentPanel<T extends { id: number; title: string; isPublished:
               {isEditing ? (
                 <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
                   {fields.map((f) => (
-                    <div key={f.key} className={f.type === 'textarea' ? 'md:col-span-2' : ''}>
+                    <div key={f.key} className={f.type === 'textarea' || f.type === 'imageUrl' ? 'md:col-span-2' : ''}>
                       <Field label={f.label}>
                         {f.type === 'textarea' ? (
                           <TextArea
                             rows={4}
                             value={String(edit[f.key] ?? '')}
                             onChange={(e) => setEdit((s) => ({ ...s, [f.key]: e.target.value }))}
+                          />
+                        ) : f.type === 'imageUrl' ? (
+                          <ImageUrlInput
+                            value={String(edit[f.key] ?? '')}
+                            onChange={(v) => setEdit((s) => ({ ...s, [f.key]: v }))}
+                            placeholder="URL veya dosya seçin"
                           />
                         ) : (
                           <TextInput value={String(edit[f.key] ?? '')} onChange={(e) => setEdit((s) => ({ ...s, [f.key]: e.target.value }))} />
