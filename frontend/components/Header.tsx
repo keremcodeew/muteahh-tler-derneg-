@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { getToken } from '../lib/api';
@@ -32,11 +33,17 @@ export function Header() {
       <div className="flex w-full items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <div className="grid size-10 place-items-center rounded-xl bg-burgundy text-white shadow-card">
-            <span className="text-sm font-bold">AMD</span>
+          <div className="relative size-10 shrink-0 overflow-hidden rounded-xl bg-white shadow-card ring-1 ring-black/5">
+            <Image
+              src="/logo.png"
+              alt="Antalya İnşaat Müteahhitleri Derneği"
+              fill
+              className="object-contain p-1"
+              priority
+            />
           </div>
           <div className="hidden leading-tight sm:block">
-            <div className="text-sm font-semibold text-slate-900">Antalya Müteahhitler Derneği</div>
+            <div className="text-sm font-semibold text-slate-900">Antalya İnşaat Müteahhitleri Derneği</div>
             <div className="text-xs text-slate-500">Kurumsal</div>
           </div>
         </Link>

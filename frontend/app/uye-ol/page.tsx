@@ -53,9 +53,9 @@ function legalTitle(k: LegalDocKey) {
 function legalText(k: LegalDocKey) {
   if (k === 'kvkk') {
     return `
-Antalya Müteahhitler Derneği (“Dernek”) olarak kişisel verilerinizin güvenliği konusunda azami hassasiyet göstermekteyiz.
+Antalya İnşaat Müteahhitleri Derneği (“Dernek”) olarak kişisel verilerinizin güvenliği konusunda azami hassasiyet göstermekteyiz.
 
-1) Veri sorumlusu: Antalya Müteahhitler Derneği.
+1) Veri sorumlusu: Antalya İnşaat Müteahhitleri Derneği.
 2) Toplanan veriler: Ad soyad, e-posta, telefon, firma/ünvan bilgileri, üyelik başvuru belgeleri ve site kullanımına ilişkin kayıtlar.
 3) Amaç: Üyelik başvurusu alınması, değerlendirilmesi, doğrulama sürecinin yürütülmesi, üyelik işlemlerinin yürütülmesi, iletişim faaliyetleri ve dernek faaliyetlerinin yürütülmesi.
 4) Hukuki sebepler: KVKK m.5 ve m.6 kapsamında; açık rıza, sözleşmenin kurulması/ifası, hukuki yükümlülük, meşru menfaat.
@@ -68,7 +68,7 @@ Bu metin bilgilendirme amaçlıdır. Başvuru sırasında ilettiğiniz belgeler 
   }
 
   return `
-Kullanım ve Üyelik Şartları (“Şartlar”) – Antalya Müteahhitler Derneği
+Kullanım ve Üyelik Şartları (“Şartlar”) – Antalya İnşaat Müteahhitleri Derneği
 
 1) Amaç: Bu site; dernek duyuruları, haberler, yayınlar ve üyelik başvuru/üyelik paneli hizmetlerini sunar.
 2) Üyelik başvurusu: Başvuru, gerekli bilgilerin ve zorunlu belgelerin yüklenmesiyle yapılır. Başvurunun kabulü platform yöneticisi onayına tabidir.

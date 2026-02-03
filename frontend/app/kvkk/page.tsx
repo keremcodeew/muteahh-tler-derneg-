@@ -9,12 +9,12 @@ export default function KvkkPage() {
       <section className="mt-8 rounded-3xl bg-white p-6 shadow-card">
         <div className="prose max-w-none prose-slate">
           <p>
-            Antalya Müteahhitler Derneği (“Dernek”) olarak, 6698 sayılı Kişisel Verilerin Korunması Kanunu (“KVKK”) kapsamında
+            Antalya İnşaat Müteahhitleri Derneği (“Dernek”) olarak, 6698 sayılı Kişisel Verilerin Korunması Kanunu (“KVKK”) kapsamında
             kişisel verilerinizin güvenliğine önem veriyoruz.
           </p>
 
           <h2>1) Veri Sorumlusu</h2>
-          <p>Veri sorumlusu: Antalya Müteahhitler Derneği.</p>
+          <p>Veri sorumlusu: Antalya İnşaat Müteahhitleri Derneği.</p>
 
           <h2>2) İşlenen Kişisel Veriler</h2>
           <ul>

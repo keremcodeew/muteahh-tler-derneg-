@@ -9,7 +9,7 @@ export default function KullanimSartlariPage() {
       <section className="mt-8 rounded-3xl bg-white p-6 shadow-card">
         <div className="prose max-w-none prose-slate">
           <p>
-            Bu web sitesi Antalya Müteahhitler Derneği tarafından işletilmektedir. Siteyi kullanarak aşağıdaki şartları kabul etmiş
+            Bu web sitesi Antalya İnşaat Müteahhitleri Derneği tarafından işletilmektedir. Siteyi kullanarak aşağıdaki şartları kabul etmiş
             sayılırsınız.
           </p>
 

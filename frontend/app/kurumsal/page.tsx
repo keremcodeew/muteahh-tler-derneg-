@@ -13,7 +13,7 @@ export default function CorporatePage() {
       heroSubtitle: 'Derneğimizin vizyonu, misyonu ve kurumsal yapısına dair genel bilgiler.',
       aboutTitle: 'Hakkımızda',
       aboutParagraph1:
-        'Antalya Müteahhitler Derneği; üyeler arasında dayanışmayı güçlendirmek, sektörel bilgi paylaşımını artırmak ve mesleki standartların gelişimine katkı sağlamak amacıyla çalışmalar yürütür.',
+        'Antalya İnşaat Müteahhitleri Derneği; üyeler arasında dayanışmayı güçlendirmek, sektörel bilgi paylaşımını artırmak ve mesleki standartların gelişimine katkı sağlamak amacıyla çalışmalar yürütür.',
       aboutParagraph2:
         'Bu sayfa, ana sayfadaki tasarım dili ile hazırlanmış bir kurumsal içerik şablonudur. İçerikler sonradan gerçek verilerle güncellenebilir.',
       quickInfo: ['Kuruluş: 20XX', 'Merkez: Antalya', 'Çalışma Alanı: İnşaat ve müteahhitlik', 'Üyelik: Başvuru + Onay'],

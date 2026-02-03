@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Antalya Müteahhitler Derneği',
+  title: 'Antalya İnşaat Müteahhitleri Derneği',
   description: 'Kurumsal web sitesi',
   icons: {
     icon: [
