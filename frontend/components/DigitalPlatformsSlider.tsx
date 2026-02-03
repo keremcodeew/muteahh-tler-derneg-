@@ -65,6 +65,10 @@ function themeClasses(accent: DigitalPlatformItem['accent']) {
 function PlatformBlock({
   item,
   align = 'left',
+  cardRef,
+  imageRef,
+  overlayRef,
+  gradientRef,
   contentRef,
   pillRef,
   titleRef,
@@ -74,9 +78,13 @@ function PlatformBlock({
 }: {
   item: DigitalPlatformItem;
   align?: 'left' | 'right';
+  cardRef?: (el: HTMLDivElement | null) => void;
+  imageRef?: (el: HTMLDivElement | null) => void;
+  overlayRef?: (el: HTMLDivElement | null) => void;
+  gradientRef?: (el: HTMLDivElement | null) => void;
   contentRef?: (el: HTMLDivElement | null) => void;
   pillRef?: (el: HTMLDivElement | null) => void;
-  titleRef?: (el: HTMLDivElement | null) => void;
+  titleRef?: (el: HTMLHeadingElement | null) => void;
   subtitleRef?: (el: HTMLDivElement | null) => void;
   descRef?: (el: HTMLParagraphElement | null) => void;
   buttonRef?: (el: HTMLSpanElement | null) => void;
@@ -88,8 +96,8 @@ function PlatformBlock({
     'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=2400&q=70';
 
   const inner = (
-    <div className="relative w-full">
-      <div className="absolute inset-0">
+    <div ref={cardRef} className="relative w-full">
+      <div ref={imageRef} className="absolute inset-0 overflow-hidden">
         <Image
           src={bg}
           alt=""
@@ -99,8 +107,8 @@ function PlatformBlock({
           className="object-cover object-center"
           priority={false}
         />
-        <div className={`absolute inset-0 backdrop-blur-[2px] ${t.overlay}`} />
-        <div className="absolute inset-0 bg-gradient-to-r from-red-950/40 via-red-900/20 to-red-800/30" />
+        <div ref={overlayRef} className={`absolute inset-0 backdrop-blur-[2px] ${t.overlay}`} />
+        <div ref={gradientRef} className="absolute inset-0 bg-gradient-to-r from-red-950/40 via-red-900/20 to-red-800/30" />
       </div>
 
       <div className="relative w-full px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
@@ -224,6 +232,10 @@ export function DigitalPlatformsSlider({
     ];
   }, [items]);
 
+  const cardElsRef = useRef<Array<HTMLDivElement | null>>([]);
+  const imageElsRef = useRef<Array<HTMLDivElement | null>>([]);
+  const overlayElsRef = useRef<Array<HTMLDivElement | null>>([]);
+  const gradientElsRef = useRef<Array<HTMLDivElement | null>>([]);
   const contentElsRef = useRef<Array<HTMLDivElement | null>>([]);
   const pillElsRef = useRef<Array<HTMLDivElement | null>>([]);
   const titleElsRef = useRef<Array<HTMLHeadingElement | null>>([]);
@@ -253,6 +265,46 @@ export function DigitalPlatformsSlider({
         // Initialize all elements as hidden with modern effects
         containerEls.forEach((containerEl, idx) => {
           const dir = containerEl.getAttribute('data-anim-dir') === 'right' ? 1 : -1;
+          
+          // Card container animation
+          const card = cardElsRef.current[idx];
+          const image = imageElsRef.current[idx];
+          const overlay = overlayElsRef.current[idx];
+          const gradient = gradientElsRef.current[idx];
+          
+          if (card) {
+            gsap.set(card, {
+              opacity: 0,
+              scale: 0.92,
+              y: 40,
+            });
+          }
+          
+          if (image) {
+            gsap.set(image, {
+              scale: 1.15,
+            });
+            // Image içindeki img elementini animasyonlu yap
+            const imgEl = image.querySelector('img');
+            if (imgEl) {
+              gsap.set(imgEl, {
+                scale: 1.15,
+                opacity: 0.7,
+              });
+            }
+          }
+          
+          if (overlay) {
+            gsap.set(overlay, {
+              opacity: 0,
+            });
+          }
+          
+          if (gradient) {
+            gsap.set(gradient, {
+              opacity: 0,
+            });
+          }
           
           // Container animation (smooth entrance)
           gsap.set(containerEl, {
@@ -330,12 +382,80 @@ export function DigitalPlatformsSlider({
               const desc = descElsRef.current[idx];
               const button = buttonElsRef.current[idx];
 
+              // Get card elements
+              const card = cardElsRef.current[idx];
+              const image = imageElsRef.current[idx];
+              const overlay = overlayElsRef.current[idx];
+              const gradient = gradientElsRef.current[idx];
+              
               // Create timeline for smooth sequential animation
               const tl = gsap.timeline({
                 defaults: { ease: 'power3.out' },
               });
 
-              // Container entrance (smooth)
+              // Card entrance animation (first - the whole card slides in)
+              if (card) {
+                tl.to(card, {
+                  opacity: 1,
+                  scale: 1,
+                  y: 0,
+                  duration: 1.0,
+                  ease: 'power3.out',
+                });
+              }
+              
+              // Background image zoom effect
+              if (image) {
+                tl.to(
+                  image,
+                  {
+                    scale: 1,
+                    duration: 1.2,
+                    ease: 'power2.out',
+                  },
+                  '-=0.8'
+                );
+                // Image içindeki img elementini animasyonlu yap
+                const imgEl = image.querySelector('img');
+                if (imgEl) {
+                  tl.to(
+                    imgEl,
+                    {
+                      scale: 1,
+                      opacity: 1,
+                      duration: 1.2,
+                      ease: 'power2.out',
+                    },
+                    '-=1.2'
+                  );
+                }
+              }
+              
+              // Overlay fade in
+              if (overlay) {
+                tl.to(
+                  overlay,
+                  {
+                    opacity: 1,
+                    duration: 0.8,
+                  },
+                  '-=1.0'
+                );
+              }
+              
+              // Gradient fade in
+              if (gradient) {
+                tl.to(
+                  gradient,
+                  {
+                    opacity: 1,
+                    duration: 0.8,
+                  },
+                  '-=0.8'
+                );
+              }
+
+              // Container/content entrance (smooth)
               tl.to(containerEl, {
                 opacity: 1,
                 x: 0,
@@ -343,7 +463,7 @@ export function DigitalPlatformsSlider({
                 scale: 1,
                 filter: 'blur(0px)',
                 duration: 0.9,
-              });
+              }, '-=0.5');
 
               // Stagger text elements with modern effects
               if (pill) {
@@ -454,6 +574,18 @@ export function DigitalPlatformsSlider({
               <PlatformBlock
                 item={item}
                 align={align}
+                cardRef={(el) => {
+                  cardElsRef.current[idx] = el;
+                }}
+                imageRef={(el) => {
+                  imageElsRef.current[idx] = el;
+                }}
+                overlayRef={(el) => {
+                  overlayElsRef.current[idx] = el;
+                }}
+                gradientRef={(el) => {
+                  gradientElsRef.current[idx] = el;
+                }}
                 contentRef={(el) => {
                   if (el) el.setAttribute('data-anim-dir', animDir);
                   contentElsRef.current[idx] = el;
