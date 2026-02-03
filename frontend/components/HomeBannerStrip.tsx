@@ -37,8 +37,8 @@ export function HomeBannerStrip({ banners, loading }: { banners: HomeBanner[]; l
         const mod: any = await import('gsap');
         const gsap = mod?.gsap || mod?.default || mod;
         if (!gsap) return;
-        if (layerARef.current) gsap.set(layerARef.current, { opacity: 1, zIndex: 2, clipPath: 'inset(0 0% 0 0)', scale: 1 });
-        if (layerBRef.current) gsap.set(layerBRef.current, { opacity: 0, zIndex: 1, clipPath: 'inset(0 0% 0 0)', scale: 1 });
+        if (layerARef.current) gsap.set(layerARef.current, { opacity: 1, zIndex: 2 });
+        if (layerBRef.current) gsap.set(layerBRef.current, { opacity: 0, zIndex: 1 });
       } catch {
       }
     })();
@@ -141,12 +141,6 @@ export function HomeBannerStrip({ banners, loading }: { banners: HomeBanner[]; l
           />
         </div>
 
-        <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/10 to-transparent" />
-        <div className="absolute inset-0 flex items-end p-4 sm:p-5">
-          <div className="w-full truncate rounded-full bg-black/35 px-3 py-1.5 text-xs font-semibold text-white/95 backdrop-blur">
-            {activeBanner.title}
-          </div>
-        </div>
       </div>
     </div>
   );
