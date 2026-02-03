@@ -8,3 +8,4 @@ frontend/.next/
 out/
 frontend/out/
 *.log
+.vercel

@@ -101,7 +101,7 @@ export function HomeBannerStrip({ banners, loading }: { banners: HomeBanner[]; l
   if (!list.length && loading) {
     return (
       <div className="relative w-full overflow-hidden rounded-3xl bg-soft-gray shadow-card">
-        <div className="h-[140px] animate-pulse sm:h-[165px] md:h-[190px]" />
+        <div className="h-[450px] animate-pulse" />
       </div>
     );
   }
@@ -123,7 +123,7 @@ export function HomeBannerStrip({ banners, loading }: { banners: HomeBanner[]; l
             src={normalizeImageSrc(layerAEffective.imageUrl)}
             alt={layerAEffective.title}
             fill
-            sizes="(min-width: 1024px) 1152px, 100vw"
+            sizes="(min-width: 1920px) 1950px, 100vw"
             className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
           />
         </div>
@@ -136,7 +136,7 @@ export function HomeBannerStrip({ banners, loading }: { banners: HomeBanner[]; l
             src={normalizeImageSrc(layerBEffective.imageUrl)}
             alt={layerBEffective.title}
             fill
-            sizes="(min-width: 1024px) 1152px, 100vw"
+            sizes="(min-width: 1920px) 1950px, 100vw"
             className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
           />
         </div>
