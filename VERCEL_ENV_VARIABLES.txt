@@ -1,0 +1,40 @@
+# VERCEL ENVIRONMENT VARIABLES
+# Bu dosyadaki değişkenleri Vercel Dashboard → Settings → Environment Variables'a ekleyin
+# Her satırı ayrı ayrı ekleyin (Key = Value formatında)
+
+# ============================================
+# VERİTABANI (PostgreSQL) - ZORUNLU
+# ============================================
+# Vercel PostgreSQL kullanıyorsanız, Storage → Postgres → .env.local'e ekle'den otomatik eklenir
+# Veya manuel olarak şu değişkenlerden birini ekleyin:
+# POSTGRES_URL_NON_POOLING=postgres://...
+# POSTGRES_URL=postgres://...
+# DATABASE_URL=postgres://...
+
+# ============================================
+# JWT SECRET - ZORUNLU
+# ============================================
+JWT_SECRET=dcfb12f4d14c4536c61043ca24f824c62ea57fa2c0c0d6f3a2f5ec1c96910f1a471511aaf806fa12ecc3b92f1ba8260e32c4f3c8efb6b2ee658251f9356050f6
+
+# ============================================
+# PLATFORM ADMIN - ZORUNLU (seed-admin.js için)
+# ============================================
+ADMIN_EMAIL=softwareofuture@gmail.com
+ADMIN_PASSWORD=MerveKerem1.0
+
+# ============================================
+# EMAILJS - Frontend için (İletişim formu + Şifre sıfırlama)
+# ============================================
+# Not: Vercel'de frontend environment variables için VITE_ prefix'i kullanılır
+VITE_EMAILJS_SERVICE_ID=service_auetifa
+VITE_EMAILJS_TEMPLATE_ID=template_plzs4wc
+VITE_EMAILJS_TEMPLATE_ID_RESET=template_t1mgfks
+VITE_EMAILJS_PUBLIC_KEY=v2oS_ZPPLmDpsWyQR
+
+# ============================================
+# OPSİYONEL
+# ============================================
+# PORT=5000 (Vercel otomatik ayarlar)
+# NODE_ENV=production (Vercel otomatik ayarlar)
+# FRONTEND_URL=https://your-domain.vercel.app (CORS için, gerekirse)
+# SEED_DEFAULT_CONTENT=true (İlk deploy'da örnek içerik eklemek için)
